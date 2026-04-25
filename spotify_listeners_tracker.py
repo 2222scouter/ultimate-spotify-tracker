@@ -5,7 +5,7 @@ from playwright.sync_api import sync_playwright
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-SHEET_CSV_URL = “https://docs.google.com/spreadsheets/d/e/2PACX-1vSa5tdG_4WSMrmGcaJhOZBwC_6oyXVSbpLjdrf8hfgRB_rHwm49rohMiE6ZATi42ScZDo5d1_fAW_Sw/pub?gid=0&single=true&output=csv”
+SHEET_CSV_URL = “https://docs.google.com/spreadsheets/d/1-wwNWsd_WYIwhogaSwj9lbII4Fsv1V1SHeQJNHkIUqk/edit?usp=drivesdk”
 
 try:
 df_artists = pd.read_csv(SHEET_CSV_URL)
