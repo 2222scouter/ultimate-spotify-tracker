@@ -148,11 +148,12 @@ header { padding: 20px; }
 main { padding: 20px; }
 #stats-row { grid-template-columns: repeat(2,1fr); }
 .bar-cell { display: none; }
-#controls { flex-direction: column; align-items: flex-start; }
-.tab-group { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; border: 1px solid var(–border); }
-.tab { border: none; border-right: 1px solid var(–border); border-bottom: 1px solid var(–border); padding: 9px 4px; font-size: .6rem; letter-spacing: .02em; text-align: center; width: 100%; }
-.tab:nth-child(3), .tab:nth-child(5) { border-right: none; }
-.tab:nth-child(4), .tab:nth-child(5) { border-bottom: none; }
+#controls { flex-direction: column; align-items: flex-start; gap: 10px; }
+.tab-group { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; overflow: visible; }
+.tab { border-right: 1px solid var(–border); border-bottom: 1px solid var(–border); padding: 10px 4px; font-size: .62rem; letter-spacing: .03em; text-align: center; }
+.tab:nth-child(3) { border-right: none; }
+.tab:nth-child(4) { border-bottom: none; }
+.tab:nth-child(5) { border-right: none; border-bottom: none; }
 .search-wrap { width: 100%; margin-left: 0; }
 .search-wrap input { width: 100%; }
 }
@@ -206,9 +207,9 @@ main { padding: 20px; }
   <div id="controls">
     <span class="control-label">Sort by</span>
     <div class="tab-group">
-      <button class="tab active" onclick="setSort('pct_desc',this)">Gained % &#9650;</button>
-      <button class="tab" onclick="setSort('pct_asc',this)">Lost % &#9650;</button>
-      <button class="tab" onclick="setSort('pct7_desc',this)">7-Day % &#9650;</button>
+      <button class="tab active" onclick="setSort('pct_desc',this)">Gained %</button>
+      <button class="tab" onclick="setSort('pct_asc',this)">Lost %</button>
+      <button class="tab" onclick="setSort('pct7_desc',this)">7-Day %</button>
       <button class="tab" onclick="setSort('listeners_desc',this)">Most Listeners</button>
       <button class="tab" onclick="setSort('name_asc',this)">A-Z</button>
     </div>
@@ -343,11 +344,11 @@ function setSort(sort, el) {
 
 function sortSummaries(list) {
   return [...list].sort((a, b) => {
-    if (currentSort === 'pct_desc')      return (b.dailyPct != null ? b.dailyPct : -Infinity) - (a.dailyPct != null ? a.dailyPct : -Infinity);
-    if (currentSort === 'pct_asc')       return (a.dailyPct != null ? a.dailyPct :  Infinity) - (b.dailyPct != null ? b.dailyPct :  Infinity);
-    if (currentSort === 'pct7_desc')     return (b.pct7 != null ? b.pct7 : -Infinity) - (a.pct7 != null ? a.pct7 : -Infinity);
+    if (currentSort === 'pct_desc')       return (b.dailyPct != null ? b.dailyPct : -Infinity) - (a.dailyPct != null ? a.dailyPct : -Infinity);
+    if (currentSort === 'pct_asc')        return (a.dailyPct != null ? a.dailyPct :  Infinity) - (b.dailyPct != null ? b.dailyPct :  Infinity);
+    if (currentSort === 'pct7_desc')      return (b.pct7 != null ? b.pct7 : -Infinity) - (a.pct7 != null ? a.pct7 : -Infinity);
     if (currentSort === 'listeners_desc') return b.last.count - a.last.count;
-    if (currentSort === 'name_asc')      return a.name.localeCompare(b.name);
+    if (currentSort === 'name_asc')       return a.name.localeCompare(b.name);
     return 0;
   });
 }
