@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 try:
 ARTISTS = []
-with open("artists.txt", "r", encoding="utf-8") as f:
+with open(“artists.txt”, “r”, encoding=“utf-8”) as f:
 for line in f:
 line = line.strip()
 if not line or “open.spotify.com/artist” not in line:
