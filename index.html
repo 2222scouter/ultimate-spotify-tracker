@@ -144,6 +144,7 @@ select:focus { border-color: var(–green); }
 .chart-box { background: var(–card); border: 1px solid var(–border); padding: 24px; position: relative; height: 340px; }
 
 @media (max-width: 768px) {
+.tab { padding: 7px 9px; font-size: .6rem; letter-spacing: .04em; }
 header { padding: 20px; }
 main { padding: 20px; }
 #stats-row { grid-template-columns: repeat(2,1fr); }
@@ -199,8 +200,9 @@ main { padding: 20px; }
   <div id="controls">
     <span class="control-label">Sort by</span>
     <div class="tab-group">
-      <button class="tab active" onclick="setSort('change_desc',this)">Gained up</button>
-      <button class="tab" onclick="setSort('change_asc',this)">Lost up</button>
+      <button class="tab active" onclick="setSort('pct_desc',this)">Gained % &#9650;</button>
+      <button class="tab" onclick="setSort('pct_asc',this)">Lost % &#9650;</button>
+      <button class="tab" onclick="setSort('pct7_desc',this)">7-Day % &#9650;</button>
       <button class="tab" onclick="setSort('listeners_desc',this)">Most Listeners</button>
       <button class="tab" onclick="setSort('name_asc',this)">A-Z</button>
     </div>
@@ -245,7 +247,7 @@ main { padding: 20px; }
 const CSV_URL = "./spotify_listeners_history.csv";
 const CSV_URL_FALLBACK = "https://raw.githubusercontent.com/2222scouter/ultimate-spotify-tracker/main/spotify_listeners_history.csv";
 
-let allData = [], artistSummaries = [], currentSort = 'change_desc', chartInstance = null;
+let allData = [], artistSummaries = [], currentSort = 'pct_desc', chartInstance = null;
 
 function parseCSV(text) {
   const lines = text.trim().split('\n');
@@ -277,7 +279,6 @@ function formatDate(str) {
   } catch(e) { return str; }
 }
 
-// Convert UTC timestamp to Phoenix date key (UTC-7, no DST)
 function toDateKey(ts) {
   const d = new Date(ts);
   if (isNaN(d)) return ts.slice(0, 10);
@@ -299,8 +300,6 @@ function buildSummaries(rows) {
   const summaries = [];
   for (const [name, entries] of Object.entries(map)) {
     entries.sort((a, b) => new Date(a.ts) - new Date(b.ts));
-
-    // Keep only latest scan per Phoenix day
     const byDay = {};
     for (const e of entries) byDay[e.dateKey] = e;
     const daily = Object.values(byDay).sort((a, b) => a.dateKey.localeCompare(b.dateKey));
@@ -311,7 +310,6 @@ function buildSummaries(rows) {
     const dailyChange = prev ? last.count - prev.count : null;
     const dailyPct = (prev && prev.count > 0) ? (dailyChange / prev.count * 100) : null;
 
-    // 7-day: find entry closest to 7 days before latest
     const cutoff = new Date(last.dateKey);
     cutoff.setDate(cutoff.getDate() - 7);
     const cutoffKey = cutoff.toISOString().slice(0, 10);
@@ -339,10 +337,11 @@ function setSort(sort, el) {
 
 function sortSummaries(list) {
   return [...list].sort((a, b) => {
-    if (currentSort === 'change_desc') return (b.dailyChange != null ? b.dailyChange : -Infinity) - (a.dailyChange != null ? a.dailyChange : -Infinity);
-    if (currentSort === 'change_asc') return (a.dailyChange != null ? a.dailyChange : Infinity) - (b.dailyChange != null ? b.dailyChange : Infinity);
+    if (currentSort === 'pct_desc')      return (b.dailyPct != null ? b.dailyPct : -Infinity) - (a.dailyPct != null ? a.dailyPct : -Infinity);
+    if (currentSort === 'pct_asc')       return (a.dailyPct != null ? a.dailyPct :  Infinity) - (b.dailyPct != null ? b.dailyPct :  Infinity);
+    if (currentSort === 'pct7_desc')     return (b.pct7 != null ? b.pct7 : -Infinity) - (a.pct7 != null ? a.pct7 : -Infinity);
     if (currentSort === 'listeners_desc') return b.last.count - a.last.count;
-    if (currentSort === 'name_asc') return a.name.localeCompare(b.name);
+    if (currentSort === 'name_asc')      return a.name.localeCompare(b.name);
     return 0;
   });
 }
