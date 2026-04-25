@@ -1,6 +1,8 @@
 name: 2222scouter Monthly Listener Tracker
 
 on:
+permissions:
+  contents: write
   schedule:
     - cron: '0 22 * * *'   # Every day at 10:00 PM UTC
   workflow_dispatch:        # Allow manual runs
