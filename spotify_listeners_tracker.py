@@ -5,22 +5,22 @@ from playwright.sync_api import sync_playwright
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-SHEET_CSV_URL = “https://docs.google.com/spreadsheets/d/1-wwNWsd_WYIwhogaSwj9lbII4Fsv1V1SHeQJNHkIUqk/edit?usp=drivesdk”
-
 try:
-df_artists = pd.read_csv(SHEET_CSV_URL)
-name_col = next((c for c in df_artists.columns if ‘artist’ in c.lower() or ‘name’ in c.lower()), df_artists.columns[0])
-url_col = next((c for c in df_artists.columns if ‘url’ in c.lower() or ‘spotify’ in c.lower()), df_artists.columns[1])
-ARTISTS = [{“name”: str(r[name_col]).strip(), “url”: str(r[url_col]).strip()}
-for _, r in df_artists.iterrows()
-if ‘open.spotify.com/artist’ in str(r[url_col])]
-print(f”Loaded {len(ARTISTS)} artists from sheet”)
+ARTISTS = []
+with open(“artists.txt”, “r”, encoding=“utf-8”) as f:
+for line in f:
+line = line.strip()
+if not line or “open.spotify.com/artist” not in line:
+continue
+parts = line.split(”,”, 1)
+if len(parts) == 2:
+name = parts[0].strip()
+url = parts[1].strip().split(”?”)[0]  # strip tracking params
+ARTISTS.append({“name”: name, “url”: url})
+print(f”Loaded {len(ARTISTS)} artists from artists.txt”)
 except Exception as e:
-print(f”Sheet load failed ({e}), using fallback”)
-ARTISTS = [
-{“name”: “Grace Ives”, “url”: “https://open.spotify.com/artist/4TZieE5978SbTInJswaay2”},
-{“name”: “King Kylie”, “url”: “https://open.spotify.com/artist/16PVIKGOsSoCCAIBANjgil”},
-]
+print(f”Failed to load artists.txt ({e})”)
+ARTISTS = []
 
 def scrape_one(artist: dict, playwright) -> dict | None:
 “”“Scrape monthly listeners for a single artist. Returns dict or None on failure.”””
