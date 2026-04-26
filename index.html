@@ -231,6 +231,10 @@
         Create a token at <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a> with <strong>repo</strong> scope. It will be saved locally and never asked again.
       </p>
     </div>
+    <div id="token-saved-section" style="display:none;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">GitHub Token <span style="color:var(--green)">&#10003; Saved</span></span>
+      <button onclick="resetToken()" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:.6rem;padding:4px 10px;cursor:pointer;text-transform:uppercase;letter-spacing:.06em;">Reset Token</button>
+    </div>
 
     <label class="modal-label">Spotify Artist URL</label>
     <input id="input-url" class="modal-input" type="text" placeholder="https://open.spotify.com/artist/..." oninput="clearNamePreview()" onblur="lookupArtistName()">
@@ -614,6 +618,14 @@ async function loadData() {
 }
 
 // ── ADD ARTIST MODAL ─────────────────────────────────────────
+function resetToken() {
+  localStorage.removeItem("gh_pat");
+  document.getElementById("token-saved-section").style.display = "none";
+  document.getElementById("token-section").style.display = "block";
+  document.getElementById("input-token").value = "";
+  document.getElementById("modal-error").style.display = "none";
+}
+
 function clearNamePreview() {
   document.getElementById("name-preview").style.display = "none";
   document.getElementById("name-preview-value").textContent = "";
@@ -673,8 +685,10 @@ function openModal() {
   const saved = localStorage.getItem("gh_pat");
   if (saved) {
     document.getElementById("token-section").style.display = "none";
+    document.getElementById("token-saved-section").style.display = "flex";
   } else {
     document.getElementById("token-section").style.display = "block";
+    document.getElementById("token-saved-section").style.display = "none";
     document.getElementById("input-token").value = "";
   }
   document.getElementById("input-url").value = "";
