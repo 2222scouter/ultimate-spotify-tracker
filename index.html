@@ -1036,7 +1036,7 @@ async function runScraper() {
   btn.disabled = true;
   btn.textContent = "⏳ Triggering...";
   try {
-    const res = await fetch("https://api.github.com/repos/" + GH_OWNER + "/" + GH_REPO + "/actions/workflows/scrape.yml/dispatches", {
+    const res = await fetch("https://api.github.com/repos/" + GH_OWNER + "/" + GH_REPO + "/actions/workflows/spotify-scraper.yml/dispatches", {
       method: "POST",
       headers: {
         "Authorization": "token " + token,
