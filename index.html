@@ -107,9 +107,12 @@
   .section-title {
     font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: .1em;
     color: var(--muted); text-transform: uppercase; margin-bottom: 16px;
-    display: flex; align-items: center; gap: 10px;
+    display: flex; align-items: center; gap: 12px;
   }
   .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .section-title .search-wrap { margin-left: 0; }
+  .section-title .search-wrap input { width: 180px; }
+  #leaderboard .section-title::after { display: none; }
   .add-btn {
     background: none; border: 1px solid var(--border); color: var(--muted);
     font-family: 'DM Mono', monospace; font-size: .62rem; letter-spacing: .08em;
@@ -203,6 +206,7 @@
     background: none; border: 1px solid var(--green); color: var(--green);
     font-family: 'DM Mono', monospace; font-size: .65rem; letter-spacing: .08em;
     padding: 7px 16px; cursor: pointer; transition: all .2s; text-transform: uppercase;
+    min-width: 0;
   }
   .scraper-btn:hover { background: var(--green); color: #fff; }
   .scraper-btn:disabled { opacity: .5; cursor: not-allowed; }
@@ -306,13 +310,10 @@
     .bar-cell { display: none; }
     .col-rank { display: none; }
     #controls { flex-direction: column; align-items: flex-start; gap: 10px; }
-    .tab-group { display: grid; grid-template-columns: repeat(6,1fr); width: 100%; overflow: visible; border: 1px solid var(--border); }
+    .tab-group { display: grid; grid-template-columns: repeat(3,1fr); width: 100%; overflow: visible; border: 1px solid var(--border); }
     .tab { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 10px 4px; font-size: .62rem; letter-spacing: .03em; text-align: center; }
-    .tab:nth-child(1) { grid-column: span 2; }
-    .tab:nth-child(2) { grid-column: span 2; }
-    .tab:nth-child(3) { grid-column: span 2; border-right: none; }
-    .tab:nth-child(4) { grid-column: span 3; border-bottom: none; }
-    .tab:nth-child(5) { grid-column: span 3; border-right: none; border-bottom: none; }
+    .tab:nth-child(3n) { border-right: none; }
+    .tab:nth-child(4), .tab:nth-child(5), .tab:nth-child(6) { border-bottom: none; }
     .search-wrap { width: 100%; margin-left: 0; }
     .search-wrap input { width: 100%; font-size: 16px; }
     table { font-size: .65rem; }
@@ -374,7 +375,7 @@
   </div>
   <div class="header-right">
     <div class="header-btn-group">
-      <button class="scraper-btn" id="scraper-btn" onclick="runScraper()">&#9654; Run Scraper</button>
+      <button class="scraper-btn" id="scraper-btn" onclick="runScraper()">&#9654; Run</button>
       <span class="header-btn-sub" id="scraper-sub">—</span>
     </div>
     <div class="header-btn-group">
@@ -389,10 +390,10 @@
   <div id="error-msg"></div>
 
   <div id="page-nav" style="display:none;margin-bottom:28px;">
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <a class="nav-shortcut" href="#leaderboard" onclick="smoothTo('leaderboard')">↓ Leaderboard</a>
-      <a class="nav-shortcut" href="#hall-of-fame" onclick="smoothTo('hall-of-fame')">↓ Hall of Fame</a>
-      <a class="nav-shortcut" href="#chart-section" onclick="smoothTo('chart-section')">↓ Listener History</a>
+    <div style="display:flex;gap:8px;flex-wrap:nowrap;">
+      <a class="nav-shortcut" href="#leaderboard" onclick="smoothTo('leaderboard')">Leaderboard</a>
+      <a class="nav-shortcut" href="#hall-of-fame" onclick="smoothTo('hall-of-fame')">Hall of Fame</a>
+      <a class="nav-shortcut" href="#chart-section" onclick="smoothTo('chart-section')">Listener History</a>
     </div>
   </div>
 
@@ -421,24 +422,27 @@
 
   <div id="controls">
     <span class="control-label">Sort by</span>
-    <div class="tab-group">
+    <div class="tab-group" style="display:grid;grid-template-columns:repeat(3,1fr);">
       <button class="tab active" onclick="setSort('pct_desc',this)">Gained %</button>
       <button class="tab" onclick="setSort('pct_asc',this)">Lost %</button>
       <button class="tab" onclick="setSort('pct7_desc',this)">7-Day %</button>
+      <button class="tab" onclick="setSort('pct30_desc',this)">30-Day %</button>
       <button class="tab" onclick="setSort('listeners_desc',this)">Most Listeners</button>
       <button class="tab" onclick="setSort('name_asc',this)">A-Z</button>
     </div>
-    <button class="compare-toggle" id="compare-toggle" onclick="toggleCompareMode()">⊕ Compare</button>
-    <div class="search-wrap">
-      <span class="search-icon">&#9906;</span>
-      <input type="text" id="search-box" placeholder="Search artist..." oninput="renderTable()">
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      <button class="compare-toggle" id="compare-toggle" onclick="toggleCompareMode()">⊕ Compare</button>
+      <button class="add-btn" onclick="openModal()">+ Add Artist</button>
     </div>
   </div>
 
   <div id="leaderboard">
     <div class="section-title">
       Leaderboard
-      <button class="add-btn" onclick="openModal()">+ Add Artist</button>
+      <div class="search-wrap" style="margin-left:0;">
+        <span class="search-icon">&#9906;</span>
+        <input type="text" id="search-box" placeholder="Search artist..." oninput="renderTable()">
+      </div>
     </div>
     <div id="compare-bar">
       <span style="font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">Compare:</span>
@@ -626,6 +630,7 @@ function sortSummaries(list) {
     if (currentSort === "pct_desc")       return (b.dailyPct != null ? b.dailyPct : -Infinity) - (a.dailyPct != null ? a.dailyPct : -Infinity);
     if (currentSort === "pct_asc")        return (a.dailyPct != null ? a.dailyPct :  Infinity) - (b.dailyPct != null ? b.dailyPct :  Infinity);
     if (currentSort === "pct7_desc")      return (b.pct7 != null ? b.pct7 : -Infinity) - (a.pct7 != null ? a.pct7 : -Infinity);
+    if (currentSort === "pct30_desc")     return (b.pct30 != null ? b.pct30 : -Infinity) - (a.pct30 != null ? a.pct30 : -Infinity);
     if (currentSort === "listeners_desc") return b.last.count - a.last.count;
     if (currentSort === "name_asc")       return a.name.localeCompare(b.name);
     return 0;
