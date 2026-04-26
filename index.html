@@ -232,6 +232,7 @@
       </p>
     </div>
 
+
     <label class="modal-label">Spotify Artist URL</label>
     <input id="input-url" class="modal-input" type="text" placeholder="https://open.spotify.com/artist/..." oninput="clearNamePreview()" onblur="lookupArtistName()">
 
@@ -454,8 +455,9 @@ function renderTable() {
     const dc = a.dailyChange;
     const dcPill = dc == null ? "pill-neutral" : dc > 0 ? "pill-up" : dc < 0 ? "pill-down" : "pill-neutral";
     const dcArrow = dc == null ? "" : dc > 0 ? "▲ " : "▼ ";
-    const pctPart = a.dailyPct != null ? " (" + (a.dailyPct >= 0 ? "+" : "") + a.dailyPct.toFixed(2) + "%)" : "";
-    const dcStr = dc == null ? "-" : dcArrow + (dc > 0 ? "+" : "") + formatNum(dc) + pctPart;
+    const pctPart = a.dailyPct != null ? " (" + (dc > 0 ? "+" : "") + formatNum(dc) + ")" : "";
+    const pctBold = a.dailyPct != null ? "<strong>" + (a.dailyPct >= 0 ? "+" : "") + a.dailyPct.toFixed(2) + "%</strong>" : "";
+    const dcStr = dc == null ? "-" : dcArrow + pctBold + pctPart;
     const p7Str = a.pct7 == null ? "-" : (a.pct7 >= 0 ? "+" : "") + a.pct7.toFixed(2) + "%";
     const p7Color = a.pct7 == null ? "var(--muted)" : a.pct7 > 0 ? "var(--green)" : a.pct7 < 0 ? "var(--down)" : "var(--muted)";
     const barW = maxListeners > 0 ? Math.round(a.last.count / maxListeners * 100) : 0;
@@ -622,6 +624,28 @@ function resetToken() {
   document.getElementById("modal-error").style.display = "none";
 }
 
+function showManualNameInput() {
+  const preview = document.getElementById("name-preview");
+  const val = document.getElementById("name-preview-value");
+  preview.style.display = "block";
+  val.textContent = "";
+  val.contentEditable = "true";
+  val.style.borderColor = "var(--green)";
+  val.style.outline = "none";
+  // Replace the static div with an input
+  const parent = val.parentNode;
+  const input = document.createElement("input");
+  input.id = "name-preview-value";
+  input.className = "modal-input";
+  input.placeholder = "Enter artist name manually...";
+  input.style.marginBottom = "0";
+  parent.replaceChild(input, val);
+  input.focus();
+
+  const label = preview.querySelector(".modal-label");
+  if (label) label.textContent = "Artist Name (enter manually)";
+}
+
 function clearNamePreview() {
   document.getElementById("name-preview").style.display = "none";
   document.getElementById("name-preview-value").textContent = "";
@@ -665,15 +689,12 @@ async function lookupArtistName() {
 
     if (name) {
       document.getElementById("name-preview-value").textContent = name;
+      document.getElementById("name-preview-value").contentEditable = "false";
     } else {
-      document.getElementById("name-preview-value").textContent = "Could not find name - will use URL ID";
-      document.getElementById("name-preview-value").textContent = "artist_" + match[1];
+      showManualNameInput();
     }
   } catch(e) {
-    document.getElementById("name-preview-value").textContent = "";
-    document.getElementById("name-preview").style.display = "none";
-    errorEl.textContent = "Could not look up artist name. Check your URL and try again.";
-    errorEl.style.display = "block";
+    showManualNameInput();
   }
 }
 
