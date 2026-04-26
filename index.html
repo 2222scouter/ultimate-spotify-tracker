@@ -1,1 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spotify Listener Tracker</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #1AA34A;
+    --black: #ffffff;
+    --card: #f5f5f5;
+    --border: #e0e0e0;
+    --text: #111111;
+    --muted: #888;
+    --down: #e05252;
+    --neutral: #888;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--black); color: var(--text); font-family: 'DM Mono', monospace; min-height: 100vh; padding: 0 0 60px; }
 
+  header {
+    background: var(--black); border-bottom: 1px solid var(--border);
+    padding: 28px 40px 22px; display: flex; align-items: flex-end; gap: 18px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: .06em; color: var(--green); line-height: 1; }
+  .logo span { color: var(--text); }
+  .subtitle { font-size: .7rem; color: var(--muted); letter-spacing: .12em; text-transform: uppercase; padding-bottom: 4px; }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+  .last-updated { font-size: .65rem; color: var(--muted); }
+  .refresh-btn {
+    background: none; border: 1px solid var(--border); color: var(--muted);
+    font-family: 'DM Mono', monospace; font-size: .65rem; letter-spacing: .08em;
+    padding: 6px 14px; cursor: pointer; transition: all .2s; text-transform: uppercase;
+  }
+  .refresh-btn:hover { border-color: var(--green); color: var(--green); }
+
+  main { padding: 36px 40px; max-width: 1400px; margin: 0 auto; }
+
+  #loading {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-height: 40vh; gap: 16px;
+    color: var(--muted); font-size: .8rem; letter-spacing: .1em;
+  }
+  .spinner {
+    width: 36px; height: 36px; border: 2px solid var(--border);
+    border-top-color: var(--green); border-radius: 50%; animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #error-msg {
+    display: none; background: #1a0e0e; border: 1px solid #3a1a1a; color: #e07070;
+    padding: 20px 28px; font-size: .78rem; line-height: 1.8; border-radius: 2px; margin-bottom: 32px;
+  }
+  #error-msg .debug-log {
+    display: block; color: #aaa; font-size: .7rem; white-space: pre-wrap;
+    background: #0a0a0a; padding: 10px; margin: 10px 0; border: 1px solid #1e1e1e;
+  }
+  #error-msg textarea {
+    width: 100%; height: 120px; background: #0a0a0a; border: 1px solid #333;
+    color: var(--text); font-family: 'DM Mono', monospace; font-size: .72rem;
+    padding: 10px; outline: none; margin-top: 8px; resize: vertical; display: block;
+  }
+  #error-msg .paste-btn {
+    margin-top: 8px; background: var(--green); border: none; color: #000;
+    font-family: 'DM Mono', monospace; font-size: .72rem; padding: 8px 18px;
+    cursor: pointer; letter-spacing: .08em; text-transform: uppercase;
+  }
+
+  #controls { display: none; margin-bottom: 32px; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .control-label { font-size: .65rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-right: 4px; }
+  .tab-group { display: flex; border: 1px solid var(--border); overflow: hidden; }
+  .tab {
+    background: none; border: none; border-right: 1px solid var(--border);
+    color: var(--muted); font-family: 'DM Mono', monospace; font-size: .68rem;
+    letter-spacing: .08em; padding: 7px 16px; cursor: pointer; text-transform: uppercase; transition: all .15s;
+  }
+  .tab:last-child { border-right: none; }
+  .tab:hover { color: var(--text); background: var(--card); }
+  .tab.active { background: var(--green); color: #000; font-weight: 500; }
+  .search-wrap { margin-left: auto; position: relative; }
+  .search-wrap input {
+    background: var(--card); border: 1px solid var(--border); color: var(--text);
+    font-family: 'DM Mono', monospace; font-size: .72rem; padding: 7px 14px 7px 32px;
+    outline: none; width: 200px; transition: border-color .2s; font-size: 16px;
+  }
+  .search-wrap input:focus { border-color: var(--green); }
+  .search-wrap input::placeholder { color: var(--muted); }
+  .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: .75rem; pointer-events: none; }
+
+  #stats-row { display: none; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 32px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); padding: 20px 22px; position: relative; overflow: hidden; }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--green); }
+  .stat-card.down::before { background: var(--down); }
+  .stat-label { font-size: .6rem; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 10px; }
+  .stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 2.1rem; line-height: 1; color: var(--text); letter-spacing: .04em; }
+  .stat-sub { font-size: .65rem; color: var(--muted); margin-top: 6px; }
+  .stat-badge { display: inline-block; font-size: .62rem; padding: 2px 8px; border-radius: 1px; margin-top: 6px; font-weight: 500; }
+  .badge-up { background: rgba(29,185,84,.15); color: var(--green); }
+  .badge-down { background: rgba(224,82,82,.15); color: var(--down); }
+
+  #leaderboard { display: none; margin-bottom: 36px; }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: .1em;
+    color: var(--muted); text-transform: uppercase; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+  thead th {
+    text-align: left; font-size: .6rem; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted); padding: 10px 16px; border-bottom: 1px solid var(--border);
+    white-space: nowrap; user-select: none;
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .12s; }
+  tbody tr:hover { background: var(--card); }
+  tbody td { padding: 13px 16px; vertical-align: middle; white-space: nowrap; }
+  .rank-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; color: var(--muted); width: 40px; }
+  .rank-num.top3 { color: var(--green); }
+  .artist-name { font-weight: 500; font-size: .82rem; }
+  .listeners-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.05rem; letter-spacing: .04em; max-width: 120px; }
+  .change-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; font-size: .7rem; font-weight: 500; border-radius: 2px; }
+  .pill-up { background: rgba(29,185,84,.12); color: var(--green); }
+  .pill-down { background: rgba(224,82,82,.12); color: var(--down); }
+  .pill-neutral { background: rgba(136,136,136,.1); color: var(--neutral); }
+  .bar-cell { width: 160px; }
+  .mini-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .mini-bar-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width .6s ease; }
+  .data-footer { margin-top: 12px; font-size: .62rem; color: var(--muted); letter-spacing: .05em; }
+
+  #chart-section { display: none; margin-bottom: 36px; }
+  .chart-controls { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  select {
+    background: var(--card); border: 1px solid var(--border); color: var(--text);
+    font-family: 'DM Mono', monospace; font-size: .7rem; padding: 7px 12px;
+    outline: none; cursor: pointer; appearance: none; min-width: 180px;
+  }
+  select:focus { border-color: var(--green); }
+  .chart-box { background: var(--card); border: 1px solid var(--border); padding: 24px; position: relative; height: 340px; }
+
+  @media (max-width: 768px) {
+    header { padding: 20px; }
+    main { padding: 20px; }
+    #stats-row { grid-template-columns: repeat(2,1fr); }
+    .bar-cell { display: none; }
+    .col-rank { display: none; }
+    #controls { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .tab-group { display: grid; grid-template-columns: repeat(3,1fr); width: 100%; overflow: visible; border: 1px solid var(--border); }
+    .tab { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 10px 4px; font-size: .62rem; letter-spacing: .03em; text-align: center; }
+    .tab:nth-child(3) { border-right: none; }
+    .tab:nth-child(4) { border-bottom: none; }
+    .tab:nth-child(5) { border-right: none; border-bottom: none; }
+    .search-wrap { width: 100%; margin-left: 0; }
+    .search-wrap input { width: 100%; font-size: 16px; }
+    table { font-size: .65rem; }
+    thead th, tbody td { padding: 9px 6px; white-space: nowrap; }
+    .artist-name { font-size: .7rem; max-width: 80px; overflow: hidden; text-overflow: ellipsis; }
+    .listeners-num { font-size: .85rem; }
+    .change-pill { padding: 2px 5px; font-size: .6rem; }
+  }
+  @media (max-width: 480px) {
+    #stats-row { grid-template-columns: 1fr 1fr; }
+    .stat-value { font-size: 1.6rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">SCOUT<span>ER</span></div>
+    <div class="subtitle">Spotify Listener Tracker</div>
+  </div>
+  <div class="header-right">
+    <span class="last-updated" id="last-updated"></span>
+    <button class="refresh-btn" onclick="loadData()">&#8635; Refresh</button>
+  </div>
+</header>
+
+<main>
+  <div id="loading"><div class="spinner"></div><span>FETCHING DATA...</span></div>
+  <div id="error-msg"></div>
+
+  <div id="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Artists Tracked</div>
+      <div class="stat-value" id="stat-artists">-</div>
+      <div class="stat-sub">unique artists</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Snapshots</div>
+      <div class="stat-value" id="stat-snapshots">-</div>
+      <div class="stat-sub">data points</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Biggest Gain Today</div>
+      <div class="stat-value" id="stat-gain-name" style="font-size:1.1rem;font-family:'DM Mono',monospace;margin-top:4px">-</div>
+      <div class="stat-badge badge-up" id="stat-gain-num"></div>
+    </div>
+    <div class="stat-card down">
+      <div class="stat-label">Biggest Drop Today</div>
+      <div class="stat-value" id="stat-drop-name" style="font-size:1.1rem;font-family:'DM Mono',monospace;margin-top:4px">-</div>
+      <div class="stat-badge badge-down" id="stat-drop-num"></div>
+    </div>
+  </div>
+
+  <div id="controls">
+    <span class="control-label">Sort by</span>
+    <div class="tab-group">
+      <button class="tab active" onclick="setSort('pct_desc',this)">Gained % &#9650;</button>
+      <button class="tab" onclick="setSort('pct_asc',this)">Lost % &#9650;</button>
+      <button class="tab" onclick="setSort('pct7_desc',this)">7-Day % &#9650;</button>
+      <button class="tab" onclick="setSort('listeners_desc',this)">Most Listeners</button>
+      <button class="tab" onclick="setSort('name_asc',this)">A-Z</button>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">&#9906;</span>
+      <input type="text" id="search-box" placeholder="Search artist..." oninput="renderTable()">
+    </div>
+  </div>
+
+  <div id="leaderboard">
+    <div class="section-title">Leaderboard</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="col-rank">#</th>
+            <th>Artist</th>
+            <th>Monthly Listeners</th>
+            <th>Change (Daily)</th>
+            <th>Change %</th>
+            <th>7-Day Change %</th>
+            <th class="bar-cell col-bar">Relative Size</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+    <div class="data-footer" id="row-count"></div>
+  </div>
+
+  <div id="chart-section">
+    <div class="section-title">Listener History</div>
+    <div class="chart-controls">
+      <span class="control-label">Artist</span>
+      <select id="chart-artist" onchange="renderChart()"></select>
+    </div>
+    <div class="chart-box"><canvas id="myChart"></canvas></div>
+  </div>
+</main>
+
+<script>
+const CSV_URL = "./spotify_listeners_history.csv";
+const CSV_URL_FALLBACK = "https://raw.githubusercontent.com/2222scouter/ultimate-spotify-tracker/main/spotify_listeners_history.csv";
+
+let allData = [], artistSummaries = [], currentSort = 'pct_desc', chartInstance = null;
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/\r/g,''));
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(',').map(c => c.trim().replace(/\r/g,''));
+    if (cols.length < 3) continue;
+    const row = {};
+    headers.forEach((h, idx) => { row[h] = cols[idx] || ''; });
+    rows.push(row);
+  }
+  return rows;
+}
+
+function formatNum(n) {
+  if (n == null) return '-';
+  const abs = Math.abs(n);
+  if (abs >= 1000000) return (n/1000000).toFixed(2) + 'M';
+  if (abs >= 1000) return (n/1000).toFixed(1) + 'K';
+  return n.toLocaleString();
+}
+
+function formatDate(str) {
+  try {
+    const d = new Date(str);
+    if (isNaN(d)) return str;
+    return d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'2-digit' });
+  } catch(e) { return str; }
+}
+
+function toDateKey(ts) {
+  const d = new Date(ts);
+  if (isNaN(d)) return ts.slice(0, 10);
+  const phoenix = new Date(d.getTime() - 7 * 60 * 60 * 1000);
+  return phoenix.toISOString().slice(0, 10);
+}
+
+function buildSummaries(rows) {
+  const map = {};
+  for (const row of rows) {
+    const name = row.artist;
+    const ts = row.timestamp;
+    const count = parseInt(row.monthly_listeners || 0, 10);
+    if (!name || !ts || isNaN(count) || count === 0) continue;
+    if (!map[name]) map[name] = [];
+    map[name].push({ ts, count, dateKey: toDateKey(ts) });
+  }
+
+  const summaries = [];
+  for (const [name, entries] of Object.entries(map)) {
+    entries.sort((a, b) => new Date(a.ts) - new Date(b.ts));
+    const byDay = {};
+    for (const e of entries) byDay[e.dateKey] = e;
+    const daily = Object.values(byDay).sort((a, b) => a.dateKey.localeCompare(b.dateKey));
+
+    const last = daily[daily.length - 1];
+    const prev = daily.length >= 2 ? daily[daily.length - 2] : null;
+
+    const dailyChange = prev ? last.count - prev.count : null;
+    const dailyPct = (prev && prev.count > 0) ? (dailyChange / prev.count * 100) : null;
+
+    const cutoff = new Date(last.dateKey);
+    cutoff.setDate(cutoff.getDate() - 7);
+    const cutoffKey = cutoff.toISOString().slice(0, 10);
+
+    let ref7 = null;
+    for (let i = daily.length - 2; i >= 0; i--) {
+      if (daily[i].dateKey <= cutoffKey) { ref7 = daily[i]; break; }
+    }
+    if (!ref7 && daily.length >= 2) ref7 = daily[0];
+
+    const change7 = ref7 ? last.count - ref7.count : null;
+    const pct7 = (ref7 && ref7.count > 0) ? (change7 / ref7.count * 100) : null;
+
+    summaries.push({ name, daily, last, prev, dailyChange, dailyPct, change7, pct7 });
+  }
+  return summaries;
+}
+
+function setSort(sort, el) {
+  currentSort = sort;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderTable();
+}
+
+function sortSummaries(list) {
+  return [...list].sort((a, b) => {
+    if (currentSort === 'pct_desc')      return (b.dailyPct != null ? b.dailyPct : -Infinity) - (a.dailyPct != null ? a.dailyPct : -Infinity);
+    if (currentSort === 'pct_asc')       return (a.dailyPct != null ? a.dailyPct :  Infinity) - (b.dailyPct != null ? b.dailyPct :  Infinity);
+    if (currentSort === 'pct7_desc')     return (b.pct7 != null ? b.pct7 : -Infinity) - (a.pct7 != null ? a.pct7 : -Infinity);
+    if (currentSort === 'listeners_desc') return b.last.count - a.last.count;
+    if (currentSort === 'name_asc')      return a.name.localeCompare(b.name);
+    return 0;
+  });
+}
+
+function renderTable() {
+  const query = document.getElementById('search-box').value.toLowerCase();
+  const filtered = artistSummaries.filter(a => a.name.toLowerCase().includes(query));
+  const sorted = sortSummaries(filtered);
+  const maxListeners = Math.max.apply(null, sorted.map(a => a.last.count));
+
+  document.getElementById('table-body').innerHTML = sorted.map((a, i) => {
+    const rankClass = i < 3 ? 'top3' : '';
+    const dc = a.dailyChange;
+    const dcPill = dc == null ? 'pill-neutral' : dc > 0 ? 'pill-up' : dc < 0 ? 'pill-down' : 'pill-neutral';
+    const dcArrow = dc == null ? '' : dc > 0 ? '▲ ' : '▼ ';
+    const dcStr = dc == null ? '-' : dcArrow + (dc > 0 ? '+' : '') + formatNum(dc);
+    const dpStr = a.dailyPct == null ? '-' : (a.dailyPct >= 0 ? '+' : '') + a.dailyPct.toFixed(2) + '%';
+    const dpColor = a.dailyPct == null ? 'var(--muted)' : a.dailyPct > 0 ? 'var(--green)' : a.dailyPct < 0 ? 'var(--down)' : 'var(--muted)';
+    const p7Str = a.pct7 == null ? '-' : (a.pct7 >= 0 ? '+' : '') + a.pct7.toFixed(2) + '%';
+    const p7Color = a.pct7 == null ? 'var(--muted)' : a.pct7 > 0 ? 'var(--green)' : a.pct7 < 0 ? 'var(--down)' : 'var(--muted)';
+    const barW = maxListeners > 0 ? Math.round(a.last.count / maxListeners * 100) : 0;
+
+    return '<tr>' +
+      '<td class="rank-num col-rank ' + rankClass + '">' + (i+1) + '</td>' +
+      '<td class="artist-name">' + a.name + '</td>' +
+      '<td class="listeners-num">' + formatNum(a.last.count) + '</td>' +
+      '<td><span class="change-pill ' + dcPill + '">' + dcStr + '</span></td>' +
+      '<td style="color:' + dpColor + ';font-size:.75rem">' + dpStr + '</td>' +
+      '<td style="color:' + p7Color + ';font-size:.75rem">' + p7Str + '</td>' +
+      '<td class="bar-cell col-bar"><div class="mini-bar"><div class="mini-bar-fill" style="width:' + barW + '%"></div></div></td>' +
+      '</tr>';
+  }).join('');
+
+  document.getElementById('row-count').textContent = 'Showing ' + sorted.length + ' of ' + artistSummaries.length + ' artists';
+}
+
+function populateChartSelect() {
+  const sel = document.getElementById('chart-artist');
+  const sorted = artistSummaries.slice().sort((a, b) => b.last.count - a.last.count);
+  sel.innerHTML = sorted.map(a => '<option value="' + a.name + '">' + a.name + '</option>').join('');
+  renderChart();
+}
+
+function renderChart() {
+  const name = document.getElementById('chart-artist').value;
+  const artist = artistSummaries.find(a => a.name === name);
+  if (!artist) return;
+  if (chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(document.getElementById('myChart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: artist.daily.map(e => formatDate(e.ts)),
+      datasets: [{
+        label: name, data: artist.daily.map(e => e.count),
+        borderColor: '#1DB954', backgroundColor: 'rgba(29,185,84,0.07)',
+        pointBackgroundColor: '#1DB954', pointRadius: 4, pointHoverRadius: 6,
+        borderWidth: 2, fill: true, tension: 0.35
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#ffffff', borderColor: '#e0e0e0', borderWidth: 1,
+          titleColor: '#888', bodyColor: '#111111',
+          titleFont: { family: 'DM Mono', size: 11 },
+          bodyFont: { family: 'DM Mono', size: 12 },
+          callbacks: { label: function(ctx) { return ' ' + ctx.parsed.y.toLocaleString() + ' listeners'; } }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#888', font: { family: 'DM Mono', size: 10 }, maxTicksLimit: 8 }, grid: { color: 'rgba(0,0,0,0.06)' }, border: { color: '#e0e0e0' } },
+        y: { ticks: { color: '#888', font: { family: 'DM Mono', size: 10 }, callback: function(v) { return formatNum(v); } }, grid: { color: 'rgba(0,0,0,0.06)' }, border: { color: '#e0e0e0' } }
+      }
+    }
+  });
+}
+
+function showStats() {
+  const withChange = artistSummaries.filter(a => a.dailyChange != null);
+  const byGain = withChange.slice().sort((a, b) => b.dailyChange - a.dailyChange);
+  const byDrop = withChange.slice().sort((a, b) => a.dailyChange - b.dailyChange);
+
+  document.getElementById('stat-artists').textContent = artistSummaries.length;
+  document.getElementById('stat-snapshots').textContent = allData.length;
+
+  if (byGain.length > 0) {
+    const g = byGain[0];
+    document.getElementById('stat-gain-name').textContent = g.name;
+    document.getElementById('stat-gain-num').textContent = '+' + formatNum(g.dailyChange) + ' today';
+  }
+  if (byDrop.length > 0) {
+    const d = byDrop[0];
+    document.getElementById('stat-drop-name').textContent = d.name;
+    document.getElementById('stat-drop-num').textContent = formatNum(d.dailyChange) + ' today';
+  }
+  document.getElementById('stats-row').style.display = 'grid';
+}
+
+function process(text) {
+  allData = parseCSV(text);
+  artistSummaries = buildSummaries(allData);
+
+  if (artistSummaries.length === 0) {
+    const err = document.getElementById('error-msg');
+    err.style.display = 'block';
+    err.textContent = 'CSV loaded but no valid data found. Expected columns: artist, timestamp, monthly_listeners';
+    return;
+  }
+
+  const now = new Date().toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+  document.getElementById('last-updated').textContent = 'Updated ' + now;
+  showStats();
+  document.getElementById('controls').style.display = 'flex';
+  document.getElementById('leaderboard').style.display = 'block';
+  renderTable();
+  document.getElementById('chart-section').style.display = 'block';
+  populateChartSelect();
+}
+
+function loadFromPaste() {
+  const text = document.getElementById('csv-paste').value;
+  if (!text.trim()) return;
+  document.getElementById('error-msg').style.display = 'none';
+  process(text);
+}
+
+async function loadData() {
+  document.getElementById('loading').style.display = 'flex';
+  document.getElementById('error-msg').style.display = 'none';
+  document.getElementById('stats-row').style.display = 'none';
+  document.getElementById('controls').style.display = 'none';
+  document.getElementById('leaderboard').style.display = 'none';
+  document.getElementById('chart-section').style.display = 'none';
+
+  let text = null;
+  const log = [];
+
+  for (const url of [CSV_URL, CSV_URL_FALLBACK]) {
+    try {
+      log.push('Trying: ' + url);
+      const res = await fetch(url);
+      log.push('Status: ' + res.status + ' ' + res.statusText);
+      if (res.ok) {
+        text = await res.text();
+        log.push('Success: got ' + text.length + ' characters');
+        break;
+      }
+    } catch(e) {
+      log.push('Error: ' + e.message);
+    }
+  }
+
+  document.getElementById('loading').style.display = 'none';
+
+  if (!text) {
+    const err = document.getElementById('error-msg');
+    err.style.display = 'block';
+    err.innerHTML =
+      '<strong>Could not load CSV.</strong><br><br>' +
+      '<strong>Debug log:</strong>' +
+      '<code class="debug-log">' + log.join('\n') + '</code>' +
+      '<strong>Paste CSV manually as a workaround:</strong>' +
+      '<textarea id="csv-paste" placeholder="Paste CSV content here..."></textarea>' +
+      '<button class="paste-btn" onclick="loadFromPaste()">Load from Paste</button>';
+    return;
+  }
+
+  process(text);
+}
+
+loadData();
+</script>
+</body>
+</html>
