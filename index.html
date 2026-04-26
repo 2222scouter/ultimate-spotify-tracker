@@ -229,8 +229,34 @@
     </div>
   </div>
 
+  <!-- ADD ARTIST MODAL -->
+  <div id="modal-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);z-index:200;align-items:center;justify-content:center;">
+    <div style="background:var(--black);border:1px solid var(--border);padding:28px;width:90%;max-width:440px;position:relative;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.1em;margin-bottom:18px;">Add Artist</div>
+      <div id="token-section">
+        <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">GitHub Token <span style="color:var(--green);font-size:.58rem;">(saved in browser, one-time setup)</span></div>
+        <input id="gh-token-input" type="password" placeholder="ghp_xxxxxxxxxxxx" style="width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:16px;padding:9px 12px;outline:none;margin-bottom:18px;">
+      </div>
+      <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">Spotify Artist URL</div>
+      <input id="add-artist-name" type="text" placeholder="e.g. open.spotify.com/artist/..." style="width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:16px;padding:9px 12px;outline:none;margin-bottom:8px;">
+      <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">Artist Name</div>
+      <input id="add-artist-url" type="text" placeholder="e.g. Malcolm Todd" style="width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:16px;padding:9px 12px;outline:none;margin-bottom:18px;">
+      <div id="add-artist-error" style="display:none;color:var(--down);font-size:.7rem;margin-bottom:12px;"></div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="submitAddArtist()" style="flex:1;background:var(--green);border:none;color:#000;font-family:'DM Mono',monospace;font-size:.72rem;padding:10px;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;font-weight:500;">Add Artist</button>
+        <button onclick="closeModal()" style="flex:1;background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;padding:10px;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;">Cancel</button>
+      </div>
+      <div id="add-artist-success" style="display:none;margin-top:14px;background:rgba(29,185,84,.12);color:var(--green);font-size:.72rem;padding:10px 12px;border:1px solid rgba(29,185,84,.2);">
+        Artist added! They will appear after the next scrape.
+      </div>
+    </div>
+  </div>
+
   <div id="leaderboard">
-    <div class="section-title">Leaderboard</div>
+    <div class="section-title" style="justify-content:space-between;">
+      <span>Leaderboard</span>
+      <button onclick="openModal()" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.08em;padding:5px 12px;cursor:pointer;text-transform:uppercase;transition:all .2s;margin-left:auto;" onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">+ Add Artist</button>
+    </div>
     <div class="table-wrap">
       <table>
         <thead>
@@ -476,6 +502,145 @@ function process(text) {
   renderTable();
   document.getElementById('chart-section').style.display = 'block';
   populateChartSelect();
+}
+
+const GITHUB_OWNER = '2222scouter';
+const GITHUB_REPO = 'ultimate-spotify-tracker';
+const GITHUB_TOKEN_SECRET = 'GH_PAT'; // stored in repo secrets - we use a proxy approach
+
+function openModal() {
+  document.getElementById('modal-overlay').style.display = 'flex';
+  document.getElementById('add-artist-name').value = '';
+  document.getElementById('add-artist-url').value = '';
+  document.getElementById('add-artist-error').style.display = 'none';
+  document.getElementById('add-artist-success').style.display = 'none';
+  // Load saved token
+  const saved = localStorage.getItem('_ghpat');
+  if (saved) {
+    window._ghpat = saved;
+    document.getElementById('token-section').style.display = 'none';
+  } else {
+    document.getElementById('token-section').style.display = 'block';
+    document.getElementById('gh-token-input').value = '';
+  }
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').style.display = 'none';
+}
+
+async function submitAddArtist() {
+  // Save token if entered
+  const tokenInput = document.getElementById('gh-token-input').value.trim();
+  if (tokenInput) {
+    window._ghpat = tokenInput;
+    localStorage.setItem('_ghpat', tokenInput);
+    document.getElementById('token-section').style.display = 'none';
+  }
+  if (!window._ghpat) {
+    errorEl.textContent = 'Please enter your GitHub token first.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  const urlInput = document.getElementById('add-artist-name').value.trim();
+  const nameInput = document.getElementById('add-artist-url').value.trim();
+  const errorEl = document.getElementById('add-artist-error');
+  const successEl = document.getElementById('add-artist-success');
+
+  errorEl.style.display = 'none';
+  successEl.style.display = 'none';
+
+  // Validate
+  if (!urlInput || !nameInput) {
+    errorEl.textContent = 'Both fields are required.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  // Extract artist ID from URL
+  const urlMatch = urlInput.match(/artist\/([a-zA-Z0-9]+)/);
+  if (!urlMatch) {
+    errorEl.textContent = 'Please enter a valid Spotify artist URL.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  const cleanUrl = 'https://open.spotify.com/artist/' + urlMatch[1];
+  const line = nameInput + ', ' + cleanUrl;
+
+  const btn = document.querySelector('#modal-overlay button');
+  btn.textContent = 'Adding...';
+  btn.disabled = true;
+
+  try {
+    // Get current artists.txt from GitHub
+    const getRes = await fetch('https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/contents/artists.txt', {
+      headers: {
+        'Authorization': 'token ' + window._ghpat,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+
+    if (getRes.status === 401 || getRes.status === 403) {
+      errorEl.textContent = 'GitHub token not configured. See instructions below.';
+      errorEl.style.display = 'block';
+      btn.textContent = 'Add Artist';
+      btn.disabled = false;
+      return;
+    }
+
+    const fileData = await getRes.json();
+    const currentContent = atob(fileData.content.replace(/
+/g, ''));
+
+    // Check if artist already exists
+    if (currentContent.includes(cleanUrl)) {
+      errorEl.textContent = 'This artist is already being tracked.';
+      errorEl.style.display = 'block';
+      btn.textContent = 'Add Artist';
+      btn.disabled = false;
+      return;
+    }
+
+    // Append new artist
+    const newContent = currentContent.trimEnd() + '
+' + line + '
+';
+    const encoded = btoa(unescape(encodeURIComponent(newContent)));
+
+    // Update file on GitHub
+    const putRes = await fetch('https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/contents/artists.txt', {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'token ' + window._ghpat,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: 'Add artist: ' + nameInput,
+        content: encoded,
+        sha: fileData.sha
+      })
+    });
+
+    if (putRes.ok) {
+      successEl.style.display = 'block';
+      btn.textContent = 'Add Artist';
+      btn.disabled = false;
+    } else {
+      const err = await putRes.json();
+      errorEl.textContent = 'GitHub error: ' + (err.message || putRes.status);
+      errorEl.style.display = 'block';
+      btn.textContent = 'Add Artist';
+      btn.disabled = false;
+    }
+  } catch(e) {
+    errorEl.textContent = 'Error: ' + e.message;
+    errorEl.style.display = 'block';
+    btn.textContent = 'Add Artist';
+    btn.disabled = false;
+  }
 }
 
 function loadFromPaste() {
