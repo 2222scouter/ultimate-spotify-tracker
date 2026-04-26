@@ -28,12 +28,14 @@
   .logo { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: .06em; color: var(--green); line-height: 1; }
   .logo span { color: var(--text); }
   .subtitle { font-size: .7rem; color: var(--muted); letter-spacing: .12em; text-transform: uppercase; padding-bottom: 4px; }
-  .header-right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 20px; }
+  .header-btn-group { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .header-btn-sub { font-size: .55rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; text-align: center; }
   .last-updated { font-size: .65rem; color: var(--muted); }
   .refresh-btn {
     background: none; border: 1px solid var(--border); color: var(--muted);
     font-family: 'DM Mono', monospace; font-size: .65rem; letter-spacing: .08em;
-    padding: 6px 14px; cursor: pointer; transition: all .2s; text-transform: uppercase;
+    padding: 7px 16px; cursor: pointer; transition: all .2s; text-transform: uppercase;
   }
   .refresh-btn:hover { border-color: var(--green); color: var(--green); }
 
@@ -187,11 +189,20 @@
     font-size: .72rem; padding: 10px 12px; border: 1px solid rgba(26,163,74,.2); margin-top: 14px;
   }
 
+  /* ── PAGE NAV SHORTCUTS ── */
+  .nav-shortcut {
+    display: inline-block; text-decoration: none;
+    font-size: .62rem; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); border: 1px solid var(--border);
+    padding: 5px 14px; transition: all .15s; cursor: pointer;
+  }
+  .nav-shortcut:hover { border-color: var(--green); color: var(--green); }
+
   /* ── RUN SCRAPER BTN ── */
   .scraper-btn {
     background: none; border: 1px solid var(--green); color: var(--green);
     font-family: 'DM Mono', monospace; font-size: .65rem; letter-spacing: .08em;
-    padding: 6px 14px; cursor: pointer; transition: all .2s; text-transform: uppercase;
+    padding: 7px 16px; cursor: pointer; transition: all .2s; text-transform: uppercase;
   }
   .scraper-btn:hover { background: var(--green); color: #fff; }
   .scraper-btn:disabled { opacity: .5; cursor: not-allowed; }
@@ -362,15 +373,28 @@
     <div class="subtitle">Spotify Listener Tracker</div>
   </div>
   <div class="header-right">
-    <span class="last-updated" id="last-updated"></span>
-    <button class="scraper-btn" id="scraper-btn" onclick="runScraper()">&#9654; Run Scraper</button>
-    <button class="refresh-btn" onclick="loadData()">&#8635; Refresh</button>
+    <div class="header-btn-group">
+      <button class="scraper-btn" id="scraper-btn" onclick="runScraper()">&#9654; Run Scraper</button>
+      <span class="header-btn-sub" id="scraper-sub">—</span>
+    </div>
+    <div class="header-btn-group">
+      <button class="refresh-btn" onclick="loadData()">&#8635; Refresh</button>
+      <span class="header-btn-sub" id="refresh-sub">—</span>
+    </div>
   </div>
 </header>
 
 <main>
   <div id="loading"><div class="spinner"></div><span>FETCHING DATA...</span></div>
   <div id="error-msg"></div>
+
+  <div id="page-nav" style="display:none;margin-bottom:28px;">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <a class="nav-shortcut" href="#leaderboard" onclick="smoothTo('leaderboard')">↓ Leaderboard</a>
+      <a class="nav-shortcut" href="#hall-of-fame" onclick="smoothTo('hall-of-fame')">↓ Hall of Fame</a>
+      <a class="nav-shortcut" href="#chart-section" onclick="smoothTo('chart-section')">↓ Listener History</a>
+    </div>
+  </div>
 
   <div id="stats-row">
     <div class="stat-card">
@@ -426,12 +450,13 @@
       <table>
         <thead>
           <tr>
-            <th class="col-rank">#</th>
+            <th class="col-rank" style="width:36px">#</th>
+            <th style="width:22px" id="compare-th"></th>
             <th>Artist</th>
-            <th>#Listeners</th>
-            <th>Change (Daily)</th>
-            <th>7-Day Change %</th>
-            <th>30-Day Change</th>
+            <th style="width:100px">#Listeners</th>
+            <th style="width:120px">Daily %</th>
+            <th style="width:110px">7-Day %</th>
+            <th style="width:110px">30-Day %</th>
             <th class="bar-cell">Relative Size</th>
           </tr>
         </thead>
@@ -492,6 +517,11 @@ const GH_REPO = "ultimate-spotify-tracker";
 
 let allData = [], artistSummaries = [], currentSort = "pct_desc", chartInstance = null;
 let compareMode = false, compareSelected = [], detailChartInstance = null, compareChartInstance = null;
+
+function smoothTo(id) {
+  const el = document.getElementById(id);
+  if (el) { el.scrollIntoView({ behavior: "smooth", block: "start" }); }
+}
 
 // ── CSV PARSING ──────────────────────────────────────────────
 function parseCSV(text) {
@@ -718,8 +748,9 @@ function process(text) {
   }
 
   const now = new Date().toLocaleString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
-  document.getElementById("last-updated").textContent = "Updated " + now;
+  document.getElementById("refresh-sub").textContent = "Updated " + now;
   showStats();
+  document.getElementById("page-nav").style.display = "block";
   document.getElementById("controls").style.display = "flex";
   document.getElementById("leaderboard").style.display = "block";
   renderTable();
@@ -742,6 +773,7 @@ async function loadData() {
   document.getElementById("error-msg").style.display = "none";
   document.getElementById("stats-row").style.display = "none";
   document.getElementById("controls").style.display = "none";
+  document.getElementById("page-nav").style.display = "none";
   document.getElementById("leaderboard").style.display = "none";
   document.getElementById("hall-of-fame").style.display = "none";
   document.getElementById("chart-section").style.display = "none";
@@ -1010,6 +1042,8 @@ async function runScraper() {
     });
     if (res.status === 204) {
       btn.textContent = "✓ Triggered!";
+      const t = new Date().toLocaleString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+      document.getElementById("scraper-sub").textContent = "Ran " + t;
       setTimeout(() => { btn.disabled = false; btn.textContent = "▶ Run Scraper"; }, 4000);
     } else {
       const e = await res.json();
