@@ -618,7 +618,6 @@ async function loadData() {
 // ── ADD ARTIST MODAL ─────────────────────────────────────────
 function resetToken() {
   localStorage.removeItem("gh_pat");
-  document.getElementById("token-saved-section").style.display = "none";
   document.getElementById("token-section").style.display = "block";
   document.getElementById("input-token").value = "";
   document.getElementById("modal-error").style.display = "none";
@@ -702,10 +701,8 @@ function openModal() {
   const saved = localStorage.getItem("gh_pat");
   if (saved) {
     document.getElementById("token-section").style.display = "none";
-    document.getElementById("token-saved-section").style.display = "flex";
   } else {
     document.getElementById("token-section").style.display = "block";
-    document.getElementById("token-saved-section").style.display = "none";
     document.getElementById("input-token").value = "";
   }
   document.getElementById("input-url").value = "";
