@@ -187,6 +187,117 @@
     font-size: .72rem; padding: 10px 12px; border: 1px solid rgba(26,163,74,.2); margin-top: 14px;
   }
 
+  /* ── RUN SCRAPER BTN ── */
+  .scraper-btn {
+    background: none; border: 1px solid var(--green); color: var(--green);
+    font-family: 'DM Mono', monospace; font-size: .65rem; letter-spacing: .08em;
+    padding: 6px 14px; cursor: pointer; transition: all .2s; text-transform: uppercase;
+  }
+  .scraper-btn:hover { background: var(--green); color: #fff; }
+  .scraper-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* ── MOMENTUM SCORE ── */
+  .momentum-score {
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.15rem; letter-spacing: .04em;
+    min-width: 44px; text-align: center;
+  }
+  .momentum-score.high { color: var(--green); }
+  .momentum-score.mid  { color: #f0a500; }
+  .momentum-score.low  { color: var(--down); }
+  .momentum-score.zero { color: var(--muted); }
+
+  /* ── ARTIST NAME CLICKABLE ── */
+  .artist-name-link {
+    cursor: pointer; text-decoration: none; color: inherit; font-weight: 500; font-size: .82rem;
+    border-bottom: 1px dashed var(--border); transition: color .15s, border-color .15s;
+  }
+  .artist-name-link:hover { color: var(--green); border-color: var(--green); }
+
+  /* ── COMPARE MODE ── */
+  .compare-toggle {
+    background: none; border: 1px solid var(--border); color: var(--muted);
+    font-family: 'DM Mono', monospace; font-size: .62rem; letter-spacing: .08em;
+    padding: 5px 12px; cursor: pointer; text-transform: uppercase; transition: all .2s; white-space: nowrap;
+  }
+  .compare-toggle.active { border-color: var(--green); color: var(--green); background: rgba(26,163,74,.08); }
+  .compare-toggle:hover { border-color: var(--green); color: var(--green); }
+  .compare-check { display: none; width: 18px; height: 18px; border: 2px solid var(--border);
+    border-radius: 2px; cursor: pointer; flex-shrink: 0; align-items: center; justify-content: center;
+    font-size: .65rem; transition: all .15s; }
+  .compare-check.selected { background: var(--green); border-color: var(--green); color: #fff; }
+  .compare-mode .compare-check { display: inline-flex; }
+  #compare-bar {
+    display: none; background: var(--card); border: 1px solid var(--green);
+    padding: 10px 16px; margin-bottom: 16px; font-size: .7rem; align-items: center; gap: 12px; flex-wrap: wrap;
+  }
+  #compare-bar.visible { display: flex; }
+  .compare-bar-artists { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
+  .compare-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 8px; border-radius: 2px; font-size: .65rem; color: #fff; font-weight: 500;
+  }
+  .compare-chip .chip-x { cursor: pointer; opacity: .75; } .compare-chip .chip-x:hover { opacity: 1; }
+  .compare-launch-btn {
+    background: var(--green); border: none; color: #fff; font-family: 'DM Mono', monospace;
+    font-size: .65rem; padding: 6px 14px; cursor: pointer; letter-spacing: .08em; text-transform: uppercase;
+  }
+  .compare-launch-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* ── LARGE MODALS (artist detail + compare chart) ── */
+  .big-modal-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.45); z-index: 300; align-items: center; justify-content: center;
+  }
+  .big-modal-overlay.open { display: flex; }
+  .big-modal-box {
+    background: #fff; border: 1px solid var(--border);
+    width: 94%; max-width: 860px; max-height: 90vh; overflow-y: auto;
+    padding: 32px; position: relative;
+  }
+  .big-modal-close {
+    position: absolute; top: 16px; right: 20px; background: none; border: none;
+    font-size: 1.1rem; color: var(--muted); cursor: pointer; font-family: 'DM Mono', monospace;
+    line-height: 1; padding: 4px 8px;
+  }
+  .big-modal-close:hover { color: var(--down); }
+  .big-modal-title {
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: .08em;
+    margin-bottom: 6px; padding-right: 40px;
+  }
+  .big-modal-sub { font-size: .65rem; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 24px; }
+  .detail-stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px; }
+  .detail-stat { background: var(--card); border: 1px solid var(--border); padding: 14px 16px; }
+  .detail-stat-label { font-size: .55rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 6px; }
+  .detail-stat-value { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: .04em; }
+  .detail-stat-sub { font-size: .6rem; color: var(--muted); margin-top: 3px; }
+  .detail-chart-box { background: var(--card); border: 1px solid var(--border); padding: 20px; height: 260px; margin-bottom: 24px; position: relative; }
+  .detail-history-title { font-size: .62rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 10px; }
+  .detail-history-table { width: 100%; border-collapse: collapse; font-size: .72rem; }
+  .detail-history-table th { text-align: left; font-size: .58rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; padding: 7px 10px; border-bottom: 1px solid var(--border); }
+  .detail-history-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); }
+  .detail-history-wrap { max-height: 220px; overflow-y: auto; }
+
+  /* ── COMPARE CHART MODAL ── */
+  .compare-chart-box { height: 340px; background: var(--card); border: 1px solid var(--border); padding: 20px; position: relative; }
+  .compare-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+  .compare-legend-item { display: flex; align-items: center; gap: 6px; font-size: .68rem; }
+  .compare-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── HALL OF FAME ── */
+  #hall-of-fame { display: none; margin-bottom: 36px; }
+  .hof-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+  .hof-card { background: var(--card); border: 1px solid var(--border); padding: 18px 20px; position: relative; overflow: hidden; }
+  .hof-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--green); }
+  .hof-card.gold::before { background: #f0a500; }
+  .hof-card.red::before { background: var(--down); }
+  .hof-icon { font-size: 1.1rem; margin-bottom: 8px; }
+  .hof-label { font-size: .55rem; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 6px; }
+  .hof-name { font-weight: 500; font-size: .85rem; margin-bottom: 4px; }
+  .hof-value { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: .04em; color: var(--green); }
+  .hof-card.gold .hof-value { color: #f0a500; }
+  .hof-card.red .hof-value { color: var(--down); }
+  .hof-sub { font-size: .6rem; color: var(--muted); margin-top: 2px; }
+
   @media (max-width: 768px) {
     header { padding: 20px; }
     main { padding: 20px; }
@@ -208,6 +319,9 @@
     .artist-name { font-size: .7rem; max-width: 110px; overflow: hidden; text-overflow: ellipsis; }
     .listeners-num { font-size: .85rem; }
     .change-pill { padding: 2px 5px; font-size: .6rem; }
+    .hof-grid { grid-template-columns: repeat(2,1fr); }
+    .detail-stats-row { grid-template-columns: repeat(2,1fr); }
+    .big-modal-box { padding: 20px; }
   }
   @media (max-width: 480px) {
     #stats-row { grid-template-columns: 1fr 1fr; }
@@ -259,6 +373,7 @@
   </div>
   <div class="header-right">
     <span class="last-updated" id="last-updated"></span>
+    <button class="scraper-btn" id="scraper-btn" onclick="runScraper()">&#9654; Run Scraper</button>
     <button class="refresh-btn" onclick="loadData()">&#8635; Refresh</button>
   </div>
 </header>
@@ -297,8 +412,10 @@
       <button class="tab" onclick="setSort('pct_asc',this)">Lost %</button>
       <button class="tab" onclick="setSort('pct7_desc',this)">7-Day %</button>
       <button class="tab" onclick="setSort('listeners_desc',this)">Most Listeners</button>
+      <button class="tab" onclick="setSort('momentum_desc',this)">Momentum</button>
       <button class="tab" onclick="setSort('name_asc',this)">A-Z</button>
     </div>
+    <button class="compare-toggle" id="compare-toggle" onclick="toggleCompareMode()">⊕ Compare</button>
     <div class="search-wrap">
       <span class="search-icon">&#9906;</span>
       <input type="text" id="search-box" placeholder="Search artist..." oninput="renderTable()">
@@ -310,15 +427,23 @@
       Leaderboard
       <button class="add-btn" onclick="openModal()">+ Add Artist</button>
     </div>
+    <div id="compare-bar">
+      <span style="font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">Compare:</span>
+      <div class="compare-bar-artists" id="compare-bar-artists"></div>
+      <button class="compare-launch-btn" id="compare-launch-btn" onclick="openCompareModal()">View Chart</button>
+      <button class="add-btn" onclick="clearCompare()">✕ Clear</button>
+    </div>
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
+            <th style="width:52px">Score</th>
             <th class="col-rank">#</th>
             <th>Artist</th>
             <th>#Listeners</th>
             <th>Change (Daily)</th>
             <th>7-Day Change %</th>
+            <th>30-Day Change</th>
             <th class="bar-cell">Relative Size</th>
           </tr>
         </thead>
@@ -326,6 +451,11 @@
       </table>
     </div>
     <div class="data-footer" id="row-count"></div>
+  </div>
+
+  <div id="hall-of-fame">
+    <div class="section-title">Hall of Fame</div>
+    <div class="hof-grid" id="hof-grid"></div>
   </div>
 
   <div id="chart-section">
@@ -338,6 +468,34 @@
   </div>
 </main>
 
+<!-- ARTIST DETAIL MODAL -->
+<div id="artist-modal" class="big-modal-overlay">
+  <div class="big-modal-box">
+    <button class="big-modal-close" onclick="closeArtistModal()">✕</button>
+    <div class="big-modal-title" id="artist-modal-title"></div>
+    <div class="big-modal-sub" id="artist-modal-sub"></div>
+    <div class="detail-stats-row" id="artist-detail-stats"></div>
+    <div class="detail-chart-box"><canvas id="detailChart"></canvas></div>
+    <div class="detail-history-title">Full History</div>
+    <div class="detail-history-wrap">
+      <table class="detail-history-table">
+        <thead><tr><th>Date</th><th>Listeners</th><th>Change</th><th>Change %</th></tr></thead>
+        <tbody id="artist-history-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- COMPARE CHART MODAL -->
+<div id="compare-modal" class="big-modal-overlay">
+  <div class="big-modal-box">
+    <button class="big-modal-close" onclick="closeCompareModal()">✕</button>
+    <div class="big-modal-title">Compare Artists</div>
+    <div class="compare-legend" id="compare-legend"></div>
+    <div class="compare-chart-box"><canvas id="compareChart"></canvas></div>
+  </div>
+</div>
+
 <script>
 const CSV_URL = "./spotify_listeners_history.csv";
 const CSV_URL_FALLBACK = "https://raw.githubusercontent.com/2222scouter/ultimate-spotify-tracker/main/spotify_listeners_history.csv";
@@ -345,6 +503,7 @@ const GH_OWNER = "2222scouter";
 const GH_REPO = "ultimate-spotify-tracker";
 
 let allData = [], artistSummaries = [], currentSort = "pct_desc", chartInstance = null;
+let compareMode = false, compareSelected = [], detailChartInstance = null, compareChartInstance = null;
 
 // ── CSV PARSING ──────────────────────────────────────────────
 function parseCSV(text) {
@@ -419,8 +578,44 @@ function buildSummaries(rows) {
     const change7 = ref7 ? last.count - ref7.count : null;
     const pct7 = (ref7 && ref7.count > 0) ? (change7 / ref7.count * 100) : null;
 
-    summaries.push({ name, daily, last, prev, dailyChange, dailyPct, change7, pct7 });
+    const cutoff30 = new Date(last.dateKey);
+    cutoff30.setDate(cutoff30.getDate() - 30);
+    const cutoffKey30 = cutoff30.toISOString().slice(0, 10);
+    let ref30 = null;
+    for (let i = daily.length - 2; i >= 0; i--) {
+      if (daily[i].dateKey <= cutoffKey30) { ref30 = daily[i]; break; }
+    }
+    if (!ref30 && daily.length >= 2) ref30 = daily[0];
+    const change30 = ref30 ? last.count - ref30.count : null;
+    const pct30 = (ref30 && ref30.count > 0) ? (change30 / ref30.count * 100) : null;
+
+    summaries.push({ name, daily, last, prev, dailyChange, dailyPct, change7, pct7, change30, pct30 });
   }
+
+  // Compute momentum scores (needs all summaries done first for normalization)
+  // Raw score: weighted combo of daily%, 7day%, 30day%, consistency
+  for (const s of summaries) {
+    const d  = s.dailyPct != null ? s.dailyPct : 0;
+    const w7 = s.pct7     != null ? s.pct7     : 0;
+    const w30= s.pct30    != null ? s.pct30    : 0;
+    // Consistency: fraction of days with positive change in last 30 days
+    const recent = s.daily.slice(-31);
+    let upDays = 0, totalDays = 0;
+    for (let i = 1; i < recent.length; i++) {
+      totalDays++;
+      if (recent[i].count > recent[i-1].count) upDays++;
+    }
+    const consistency = totalDays > 0 ? (upDays / totalDays) : 0.5;
+    s.momentumRaw = (d * 0.25) + (w7 * 0.35) + (w30 * 0.25) + (consistency * 100 * 0.15);
+  }
+  // Normalize to 0-100
+  const mVals = summaries.map(s => s.momentumRaw);
+  const mMin = Math.min(...mVals), mMax = Math.max(...mVals);
+  const mRange = mMax - mMin || 1;
+  for (const s of summaries) {
+    s.momentum = Math.round((s.momentumRaw - mMin) / mRange * 100);
+  }
+
   return summaries;
 }
 
@@ -438,6 +633,7 @@ function sortSummaries(list) {
     if (currentSort === "pct_asc")        return (a.dailyPct != null ? a.dailyPct :  Infinity) - (b.dailyPct != null ? b.dailyPct :  Infinity);
     if (currentSort === "pct7_desc")      return (b.pct7 != null ? b.pct7 : -Infinity) - (a.pct7 != null ? a.pct7 : -Infinity);
     if (currentSort === "listeners_desc") return b.last.count - a.last.count;
+    if (currentSort === "momentum_desc")  return b.momentum - a.momentum;
     if (currentSort === "name_asc")       return a.name.localeCompare(b.name);
     return 0;
   });
@@ -452,22 +648,32 @@ function renderTable() {
 
   document.getElementById("table-body").innerHTML = sorted.map((a, i) => {
     const rankClass = i < 3 ? "top3" : "";
-    const dc = a.dailyChange;
-    const dcPill = dc == null ? "pill-neutral" : dc > 0 ? "pill-up" : dc < 0 ? "pill-down" : "pill-neutral";
-    const dcArrow = dc == null ? "" : dc > 0 ? "▲ " : "▼ ";
-    const pctPart = a.dailyPct != null ? " (" + (dc > 0 ? "+" : "") + formatNum(dc) + ")" : "";
-    const pctBold = a.dailyPct != null ? "<strong>" + (a.dailyPct >= 0 ? "+" : "") + a.dailyPct.toFixed(2) + "%</strong>" : "";
-    const dcStr = dc == null ? "-" : dcArrow + pctBold + pctPart;
-    const p7Str = a.pct7 == null ? "-" : (a.pct7 >= 0 ? "+" : "") + a.pct7.toFixed(2) + "%";
-    const p7Color = a.pct7 == null ? "var(--muted)" : a.pct7 > 0 ? "var(--green)" : a.pct7 < 0 ? "var(--down)" : "var(--muted)";
+
+    function pillHtml(pct) {
+      if (pct == null) return "<span class=\"change-pill pill-neutral\">-</span>";
+      const cls = pct > 0 ? "pill-up" : pct < 0 ? "pill-down" : "pill-neutral";
+      const arrow = pct > 0 ? "▲ " : pct < 0 ? "▼ " : "";
+      return "<span class=\"change-pill " + cls + "\">" + arrow + "<strong>" + (pct >= 0 ? "+" : "") + pct.toFixed(2) + "%</strong></span>";
+    }
+
+    const m = a.momentum;
+    const mClass = m >= 70 ? "high" : m >= 40 ? "mid" : m > 0 ? "low" : "zero";
+    const momentumCell = "<td><span class=\"momentum-score " + mClass + "\">" + m + "</span></td>";
+
+    const isSelected = compareSelected.includes(a.name);
+    const checkCell = "<td style=\"width:28px;padding-right:4px\"><span class=\"compare-check" + (isSelected ? " selected" : "") + "\" onclick=\"toggleCompareArtist('" + a.name.replace(/'/g,"\\'"  ) + "',this)\">✓</span></td>";
+
     const barW = maxListeners > 0 ? Math.round(a.last.count / maxListeners * 100) : 0;
 
     return "<tr>" +
+      momentumCell +
       "<td class=\"rank-num col-rank " + rankClass + "\">" + (i + 1) + "</td>" +
-      "<td class=\"artist-name\">" + a.name + "</td>" +
+      checkCell +
+      "<td class=\"artist-name\"><span class=\"artist-name-link\" onclick=\"openArtistModal('" + a.name.replace(/'/g,"\\'") + "')\">" + a.name + "</span></td>" +
       "<td class=\"listeners-num\">" + formatNum(a.last.count) + "</td>" +
-      "<td><span class=\"change-pill " + dcPill + "\">" + dcStr + "</span></td>" +
-      "<td style=\"color:" + p7Color + ";font-size:.75rem\">" + p7Str + "</td>" +
+      "<td>" + pillHtml(a.dailyPct) + "</td>" +
+      "<td>" + pillHtml(a.pct7) + "</td>" +
+      "<td>" + pillHtml(a.pct30) + "</td>" +
       "<td class=\"bar-cell\"><div class=\"mini-bar\"><div class=\"mini-bar-fill\" style=\"width:" + barW + "%\"></div></div></td>" +
       "</tr>";
   }).join("");
@@ -559,6 +765,8 @@ function process(text) {
   document.getElementById("controls").style.display = "flex";
   document.getElementById("leaderboard").style.display = "block";
   renderTable();
+  buildHallOfFame();
+  document.getElementById("hall-of-fame").style.display = "block";
   document.getElementById("chart-section").style.display = "block";
   populateChartSelect();
 }
@@ -577,6 +785,7 @@ async function loadData() {
   document.getElementById("stats-row").style.display = "none";
   document.getElementById("controls").style.display = "none";
   document.getElementById("leaderboard").style.display = "none";
+  document.getElementById("hall-of-fame").style.display = "none";
   document.getElementById("chart-section").style.display = "none";
 
   let text = null;
@@ -821,10 +1030,307 @@ async function submitArtist() {
   }
 }
 
-// Close modal on overlay click
-document.getElementById("modal-overlay").addEventListener("click", function(e) {
-  if (e.target === this) closeModal();
-});
+// ── RUN SCRAPER ──────────────────────────────────────────────
+async function runScraper() {
+  const token = localStorage.getItem("gh_pat");
+  if (!token) {
+    alert("No GitHub token saved. Add an artist first to save your token.");
+    return;
+  }
+  const btn = document.getElementById("scraper-btn");
+  btn.disabled = true;
+  btn.textContent = "⏳ Triggering...";
+  try {
+    const res = await fetch("https://api.github.com/repos/" + GH_OWNER + "/" + GH_REPO + "/actions/workflows/scrape.yml/dispatches", {
+      method: "POST",
+      headers: {
+        "Authorization": "token " + token,
+        "Accept": "application/vnd.github.v3+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ ref: "main" })
+    });
+    if (res.status === 204) {
+      btn.textContent = "✓ Triggered!";
+      setTimeout(() => { btn.disabled = false; btn.textContent = "▶ Run Scraper"; }, 4000);
+    } else {
+      const e = await res.json();
+      alert("Error: " + (e.message || res.status));
+      btn.disabled = false; btn.textContent = "▶ Run Scraper";
+    }
+  } catch(e) {
+    alert("Failed: " + e.message);
+    btn.disabled = false; btn.textContent = "▶ Run Scraper";
+  }
+}
+
+// ── MOMENTUM ─────────────────────────────────────────────────
+// (score is computed in buildSummaries)
+
+// ── COMPARE MODE ─────────────────────────────────────────────
+const COMPARE_COLORS = ["#1AA34A","#e05252","#f0a500","#5b8de0","#a05be0"];
+
+function toggleCompareMode() {
+  compareMode = !compareMode;
+  const btn = document.getElementById("compare-toggle");
+  btn.classList.toggle("active", compareMode);
+  document.getElementById("table-body").classList && null;
+  const tbody = document.getElementById("table-body");
+  tbody.querySelectorAll(".compare-check").forEach(el => {
+    el.style.display = compareMode ? "inline-flex" : "none";
+  });
+  if (!compareMode) { clearCompare(); }
+}
+
+function toggleCompareArtist(name, el) {
+  if (compareSelected.includes(name)) {
+    compareSelected = compareSelected.filter(n => n !== name);
+    el.classList.remove("selected");
+  } else {
+    if (compareSelected.length >= 5) { alert("Maximum 5 artists for comparison."); return; }
+    compareSelected.push(name);
+    el.classList.add("selected");
+  }
+  updateCompareBar();
+}
+
+function updateCompareBar() {
+  const bar = document.getElementById("compare-bar");
+  const chipsEl = document.getElementById("compare-bar-artists");
+  if (compareSelected.length === 0) { bar.classList.remove("visible"); return; }
+  bar.classList.add("visible");
+  chipsEl.innerHTML = compareSelected.map((name, i) => {
+    const color = COMPARE_COLORS[i % COMPARE_COLORS.length];
+    return "<span class=\"compare-chip\" style=\"background:" + color + "\">" +
+      name + "<span class=\"chip-x\" onclick=\"removeCompareArtist('" + name.replace(/'/g,"\\'") + "')\">✕</span></span>";
+  }).join("");
+  document.getElementById("compare-launch-btn").disabled = compareSelected.length < 2;
+}
+
+function removeCompareArtist(name) {
+  compareSelected = compareSelected.filter(n => n !== name);
+  renderTable();
+  updateCompareBar();
+}
+
+function clearCompare() {
+  compareSelected = [];
+  renderTable();
+  updateCompareBar();
+}
+
+function openCompareModal() {
+  if (compareSelected.length < 2) return;
+  document.getElementById("compare-modal").classList.add("open");
+  renderCompareChart();
+}
+
+function closeCompareModal() {
+  document.getElementById("compare-modal").classList.remove("open");
+  if (compareChartInstance) { compareChartInstance.destroy(); compareChartInstance = null; }
+}
+
+function renderCompareChart() {
+  if (compareChartInstance) { compareChartInstance.destroy(); compareChartInstance = null; }
+  const artists = compareSelected.map(name => artistSummaries.find(a => a.name === name)).filter(Boolean);
+
+  // Build unified date labels
+  const allDates = new Set();
+  artists.forEach(a => a.daily.forEach(e => allDates.add(e.dateKey)));
+  const labels = Array.from(allDates).sort();
+
+  const datasets = artists.map((a, i) => {
+    const color = COMPARE_COLORS[i % COMPARE_COLORS.length];
+    const dataMap = {};
+    a.daily.forEach(e => dataMap[e.dateKey] = e.count);
+    return {
+      label: a.name,
+      data: labels.map(d => dataMap[d] != null ? dataMap[d] : null),
+      borderColor: color, backgroundColor: color + "18",
+      pointBackgroundColor: color, pointRadius: 3, pointHoverRadius: 5,
+      borderWidth: 2, fill: false, tension: 0.3, spanGaps: true
+    };
+  });
+
+  const legendEl = document.getElementById("compare-legend");
+  legendEl.innerHTML = artists.map((a, i) =>
+    "<span class=\"compare-legend-item\"><span class=\"compare-legend-dot\" style=\"background:" + COMPARE_COLORS[i] + "\"></span>" + a.name + "</span>"
+  ).join("");
+
+  compareChartInstance = new Chart(document.getElementById("compareChart").getContext("2d"), {
+    type: "line",
+    data: { labels: labels.map(d => formatDate(d)), datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: "#fff", borderColor: "#e0e0e0", borderWidth: 1,
+          titleColor: "#888", bodyColor: "#111",
+          titleFont: { family: "DM Mono", size: 11 }, bodyFont: { family: "DM Mono", size: 11 },
+          callbacks: { label: ctx => " " + ctx.dataset.label + ": " + ctx.parsed.y.toLocaleString() }
+        }
+      },
+      scales: {
+        x: { ticks: { color: "#888", font: { family: "DM Mono", size: 10 }, maxTicksLimit: 8 }, grid: { color: "rgba(0,0,0,0.06)" }, border: { color: "#e0e0e0" } },
+        y: { ticks: { color: "#888", font: { family: "DM Mono", size: 10 }, callback: v => formatNum(v) }, grid: { color: "rgba(0,0,0,0.06)" }, border: { color: "#e0e0e0" } }
+      }
+    }
+  });
+}
+
+// ── ARTIST DETAIL MODAL ───────────────────────────────────────
+function openArtistModal(name) {
+  const a = artistSummaries.find(x => x.name === name);
+  if (!a) return;
+
+  document.getElementById("artist-modal-title").textContent = a.name;
+  document.getElementById("artist-modal-sub").textContent =
+    "Momentum Score: " + a.momentum + " / 100  ·  " + a.daily.length + " days of data";
+
+  // Stats
+  const peak = Math.max(...a.daily.map(e => e.count));
+  const peakDay = a.daily.find(e => e.count === peak);
+  let bestDayChange = null, bestDayDate = null, worstDayChange = null, worstDayDate = null;
+  for (let i = 1; i < a.daily.length; i++) {
+    const diff = a.daily[i].count - a.daily[i-1].count;
+    if (bestDayChange === null || diff > bestDayChange) { bestDayChange = diff; bestDayDate = a.daily[i].dateKey; }
+    if (worstDayChange === null || diff < worstDayChange) { worstDayChange = diff; worstDayDate = a.daily[i].dateKey; }
+  }
+  document.getElementById("artist-detail-stats").innerHTML = [
+    { label: "Current Listeners", value: formatNum(a.last.count), sub: formatDate(a.last.dateKey) },
+    { label: "Peak Listeners", value: formatNum(peak), sub: peakDay ? formatDate(peakDay.dateKey) : "" },
+    { label: "Best Day", value: (bestDayChange >= 0 ? "+" : "") + formatNum(bestDayChange), sub: bestDayDate ? formatDate(bestDayDate) : "" },
+    { label: "Worst Day", value: (worstDayChange >= 0 ? "+" : "") + formatNum(worstDayChange), sub: worstDayDate ? formatDate(worstDayDate) : "" }
+  ].map(s => "<div class=\"detail-stat\"><div class=\"detail-stat-label\">" + s.label + "</div><div class=\"detail-stat-value\">" + s.value + "</div><div class=\"detail-stat-sub\">" + s.sub + "</div></div>").join("");
+
+  // History table (newest first)
+  const hist = a.daily.slice().reverse();
+  document.getElementById("artist-history-body").innerHTML = hist.map((e, i) => {
+    const nextIdx = a.daily.length - 1 - i - 1;
+    const prev = nextIdx >= 0 ? a.daily[nextIdx] : null;
+    const chg = prev ? e.count - prev.count : null;
+    const pct = (prev && prev.count > 0) ? (chg / prev.count * 100) : null;
+    const chgStr = chg == null ? "-" : (chg >= 0 ? "+" : "") + formatNum(chg);
+    const pctStr = pct == null ? "-" : (pct >= 0 ? "+" : "") + pct.toFixed(2) + "%";
+    const color = chg == null ? "" : chg > 0 ? "color:var(--green)" : chg < 0 ? "color:var(--down)" : "";
+    return "<tr><td>" + formatDate(e.ts) + "</td><td>" + formatNum(e.count) + "</td>" +
+      "<td style=\"" + color + "\">" + chgStr + "</td><td style=\"" + color + "\">" + pctStr + "</td></tr>";
+  }).join("");
+
+  // Chart
+  if (detailChartInstance) { detailChartInstance.destroy(); detailChartInstance = null; }
+  document.getElementById("artist-modal").classList.add("open");
+  setTimeout(() => {
+    detailChartInstance = new Chart(document.getElementById("detailChart").getContext("2d"), {
+      type: "line",
+      data: {
+        labels: a.daily.map(e => formatDate(e.ts)),
+        datasets: [{ label: name, data: a.daily.map(e => e.count),
+          borderColor: "#1AA34A", backgroundColor: "rgba(26,163,74,0.07)",
+          pointBackgroundColor: "#1AA34A", pointRadius: 3, pointHoverRadius: 5,
+          borderWidth: 2, fill: true, tension: 0.35 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false },
+          tooltip: { backgroundColor: "#fff", borderColor: "#e0e0e0", borderWidth: 1,
+            titleColor: "#888", bodyColor: "#111",
+            titleFont: { family: "DM Mono", size: 11 }, bodyFont: { family: "DM Mono", size: 12 },
+            callbacks: { label: ctx => " " + ctx.parsed.y.toLocaleString() + " listeners" } }
+        },
+        scales: {
+          x: { ticks: { color: "#888", font: { family: "DM Mono", size: 10 }, maxTicksLimit: 7 }, grid: { color: "rgba(0,0,0,0.06)" }, border: { color: "#e0e0e0" } },
+          y: { ticks: { color: "#888", font: { family: "DM Mono", size: 10 }, callback: v => formatNum(v) }, grid: { color: "rgba(0,0,0,0.06)" }, border: { color: "#e0e0e0" } }
+        }
+      }
+    });
+  }, 50);
+}
+
+function closeArtistModal() {
+  document.getElementById("artist-modal").classList.remove("open");
+  if (detailChartInstance) { detailChartInstance.destroy(); detailChartInstance = null; }
+}
+
+// ── HALL OF FAME ──────────────────────────────────────────────
+function buildHallOfFame() {
+  const grid = document.getElementById("hof-grid");
+  if (artistSummaries.length === 0) { grid.innerHTML = ""; return; }
+
+  // All-time records from raw data
+  const byArtist = {};
+  for (const s of artistSummaries) byArtist[s.name] = s;
+
+  // Biggest single-day gain / drop (absolute)
+  let bigGain = null, bigDrop = null;
+  for (const s of artistSummaries) {
+    for (let i = 1; i < s.daily.length; i++) {
+      const diff = s.daily[i].count - s.daily[i-1].count;
+      if (bigGain === null || diff > bigGain.diff) bigGain = { name: s.name, diff, date: s.daily[i].dateKey };
+      if (bigDrop === null || diff < bigDrop.diff) bigDrop = { name: s.name, diff, date: s.daily[i].dateKey };
+    }
+  }
+
+  // Most listeners ever
+  let peakEver = null;
+  for (const s of artistSummaries) {
+    const peak = Math.max(...s.daily.map(e => e.count));
+    if (peakEver === null || peak > peakEver.count) peakEver = { name: s.name, count: peak };
+  }
+
+  // Fastest growing 7-day
+  const by7 = artistSummaries.filter(s => s.pct7 != null).sort((a,b) => b.pct7 - a.pct7)[0];
+  // Fastest growing 30-day
+  const by30 = artistSummaries.filter(s => s.pct30 != null).sort((a,b) => b.pct30 - a.pct30)[0];
+  // Highest momentum
+  const topMom = artistSummaries.slice().sort((a,b) => b.momentum - a.momentum)[0];
+  // Most consistent (highest fraction of positive days)
+  let mostConsistent = null;
+  for (const s of artistSummaries) {
+    let up = 0, total = 0;
+    for (let i = 1; i < s.daily.length; i++) { total++; if (s.daily[i].count > s.daily[i-1].count) up++; }
+    const frac = total > 0 ? up / total : 0;
+    if (!mostConsistent || frac > mostConsistent.frac) mostConsistent = { name: s.name, frac, up, total };
+  }
+
+  const cards = [
+    { icon: "🏆", label: "Highest Momentum Score", name: topMom ? topMom.name : "-", value: topMom ? topMom.momentum + " pts" : "-", sub: "", cls: "gold" },
+    { icon: "🚀", label: "Biggest Single-Day Gain", name: bigGain ? bigGain.name : "-", value: bigGain ? "+" + formatNum(bigGain.diff) : "-", sub: bigGain ? formatDate(bigGain.date) : "", cls: "" },
+    { icon: "📉", label: "Biggest Single-Day Drop", name: bigDrop ? bigDrop.name : "-", value: bigDrop ? formatNum(bigDrop.diff) : "-", sub: bigDrop ? formatDate(bigDrop.date) : "", cls: "red" },
+    { icon: "⚡", label: "Fastest 7-Day Growth", name: by7 ? by7.name : "-", value: by7 ? "+" + by7.pct7.toFixed(2) + "%" : "-", sub: "7-day change", cls: "" },
+    { icon: "📈", label: "Fastest 30-Day Growth", name: by30 ? by30.name : "-", value: by30 ? "+" + by30.pct30.toFixed(2) + "%" : "-", sub: "30-day change", cls: "" },
+    { icon: "👑", label: "Most Listeners Ever", name: peakEver ? peakEver.name : "-", value: peakEver ? formatNum(peakEver.count) : "-", sub: "peak count", cls: "gold" },
+    { icon: "🔒", label: "Most Consistent Growth", name: mostConsistent ? mostConsistent.name : "-", value: mostConsistent ? Math.round(mostConsistent.frac * 100) + "%" : "-", sub: mostConsistent ? mostConsistent.up + " of " + mostConsistent.total + " days up" : "", cls: "" },
+    { icon: "💥", label: "Biggest Daily % Gain Ever", name: "-", value: "-", sub: "", cls: "" },
+  ];
+
+  // Biggest % single day gain/drop
+  let bigPctGain = null, bigPctDrop = null;
+  for (const s of artistSummaries) {
+    for (let i = 1; i < s.daily.length; i++) {
+      const diff = s.daily[i].count - s.daily[i-1].count;
+      const pct = s.daily[i-1].count > 0 ? diff / s.daily[i-1].count * 100 : 0;
+      if (bigPctGain === null || pct > bigPctGain.pct) bigPctGain = { name: s.name, pct, date: s.daily[i].dateKey };
+      if (bigPctDrop === null || pct < bigPctDrop.pct) bigPctDrop = { name: s.name, pct, date: s.daily[i].dateKey };
+    }
+  }
+  cards[7] = { icon: "💥", label: "Biggest Daily % Gain", name: bigPctGain ? bigPctGain.name : "-", value: bigPctGain ? "+" + bigPctGain.pct.toFixed(2) + "%" : "-", sub: bigPctGain ? formatDate(bigPctGain.date) : "", cls: "" };
+
+  grid.innerHTML = cards.map(c =>
+    "<div class=\"hof-card " + c.cls + "\">" +
+    "<div class=\"hof-icon\">" + c.icon + "</div>" +
+    "<div class=\"hof-label\">" + c.label + "</div>" +
+    "<div class=\"hof-name\">" + c.name + "</div>" +
+    "<div class=\"hof-value\">" + c.value + "</div>" +
+    "<div class=\"hof-sub\">" + c.sub + "</div></div>"
+  ).join("");
+}
+
+// Close modals on overlay click
+document.getElementById("modal-overlay").addEventListener("click", function(e) { if (e.target === this) closeModal(); });
+document.getElementById("artist-modal").addEventListener("click", function(e) { if (e.target === this) closeArtistModal(); });
+document.getElementById("compare-modal").addEventListener("click", function(e) { if (e.target === this) closeCompareModal(); });
 
 loadData();
 </script>
