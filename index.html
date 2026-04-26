@@ -239,7 +239,6 @@
             <th>Artist</th>
             <th>#Listeners</th>
             <th>Change (Daily)</th>
-            <th>Change %</th>
             <th>7-Day Change %</th>
             <th class="bar-cell col-bar">Relative Size</th>
           </tr>
@@ -385,8 +384,7 @@ function renderTable() {
       '<td class="rank-num col-rank ' + rankClass + '">' + (i+1) + '</td>' +
       '<td class="artist-name">' + a.name + '</td>' +
       '<td class="listeners-num">' + formatNum(a.last.count) + '</td>' +
-      '<td><span class="change-pill ' + dcPill + '">' + dcStr + '</span></td>' +
-      '<td style="color:' + dpColor + ';font-size:.75rem">' + dpStr + '</td>' +
+      '<td><span class="change-pill ' + dcPill + '">' + dcStr + (a.dailyPct != null ? ' (' + (a.dailyPct >= 0 ? '+' : '') + a.dailyPct.toFixed(2) + '%)' : '') + '</span></td>' +
       '<td style="color:' + p7Color + ';font-size:.75rem">' + p7Str + '</td>' +
       '<td class="bar-cell col-bar"><div class="mini-bar"><div class="mini-bar-fill" style="width:' + barW + '%"></div></div></td>' +
       '</tr>';
