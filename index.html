@@ -196,16 +196,6 @@
   .scraper-btn:hover { background: var(--green); color: #fff; }
   .scraper-btn:disabled { opacity: .5; cursor: not-allowed; }
 
-  /* ── MOMENTUM SCORE ── */
-  .momentum-score {
-    font-family: 'Bebas Neue', sans-serif; font-size: 1.15rem; letter-spacing: .04em;
-    min-width: 44px; text-align: center;
-  }
-  .momentum-score.high { color: var(--green); }
-  .momentum-score.mid  { color: #f0a500; }
-  .momentum-score.low  { color: var(--down); }
-  .momentum-score.zero { color: var(--muted); }
-
   /* ── ARTIST NAME CLICKABLE ── */
   .artist-name-link {
     cursor: pointer; text-decoration: none; color: inherit; font-weight: 500; font-size: .82rem;
@@ -412,7 +402,6 @@
       <button class="tab" onclick="setSort('pct_asc',this)">Lost %</button>
       <button class="tab" onclick="setSort('pct7_desc',this)">7-Day %</button>
       <button class="tab" onclick="setSort('listeners_desc',this)">Most Listeners</button>
-      <button class="tab" onclick="setSort('momentum_desc',this)">Momentum</button>
       <button class="tab" onclick="setSort('name_asc',this)">A-Z</button>
     </div>
     <button class="compare-toggle" id="compare-toggle" onclick="toggleCompareMode()">⊕ Compare</button>
@@ -437,7 +426,6 @@
       <table>
         <thead>
           <tr>
-            <th style="width:52px">Score</th>
             <th class="col-rank">#</th>
             <th>Artist</th>
             <th>#Listeners</th>
@@ -592,30 +580,6 @@ function buildSummaries(rows) {
     summaries.push({ name, daily, last, prev, dailyChange, dailyPct, change7, pct7, change30, pct30 });
   }
 
-  // Compute momentum scores (needs all summaries done first for normalization)
-  // Raw score: weighted combo of daily%, 7day%, 30day%, consistency
-  for (const s of summaries) {
-    const d  = s.dailyPct != null ? s.dailyPct : 0;
-    const w7 = s.pct7     != null ? s.pct7     : 0;
-    const w30= s.pct30    != null ? s.pct30    : 0;
-    // Consistency: fraction of days with positive change in last 30 days
-    const recent = s.daily.slice(-31);
-    let upDays = 0, totalDays = 0;
-    for (let i = 1; i < recent.length; i++) {
-      totalDays++;
-      if (recent[i].count > recent[i-1].count) upDays++;
-    }
-    const consistency = totalDays > 0 ? (upDays / totalDays) : 0.5;
-    s.momentumRaw = (d * 0.25) + (w7 * 0.35) + (w30 * 0.25) + (consistency * 100 * 0.15);
-  }
-  // Normalize to 0-100
-  const mVals = summaries.map(s => s.momentumRaw);
-  const mMin = Math.min(...mVals), mMax = Math.max(...mVals);
-  const mRange = mMax - mMin || 1;
-  for (const s of summaries) {
-    s.momentum = Math.round((s.momentumRaw - mMin) / mRange * 100);
-  }
-
   return summaries;
 }
 
@@ -633,7 +597,6 @@ function sortSummaries(list) {
     if (currentSort === "pct_asc")        return (a.dailyPct != null ? a.dailyPct :  Infinity) - (b.dailyPct != null ? b.dailyPct :  Infinity);
     if (currentSort === "pct7_desc")      return (b.pct7 != null ? b.pct7 : -Infinity) - (a.pct7 != null ? a.pct7 : -Infinity);
     if (currentSort === "listeners_desc") return b.last.count - a.last.count;
-    if (currentSort === "momentum_desc")  return b.momentum - a.momentum;
     if (currentSort === "name_asc")       return a.name.localeCompare(b.name);
     return 0;
   });
@@ -656,17 +619,12 @@ function renderTable() {
       return "<span class=\"change-pill " + cls + "\">" + arrow + "<strong>" + (pct >= 0 ? "+" : "") + pct.toFixed(2) + "%</strong></span>";
     }
 
-    const m = a.momentum;
-    const mClass = m >= 70 ? "high" : m >= 40 ? "mid" : m > 0 ? "low" : "zero";
-    const momentumCell = "<td><span class=\"momentum-score " + mClass + "\">" + m + "</span></td>";
-
     const isSelected = compareSelected.includes(a.name);
     const checkCell = "<td style=\"width:28px;padding-right:4px\"><span class=\"compare-check" + (isSelected ? " selected" : "") + "\" onclick=\"toggleCompareArtist('" + a.name.replace(/'/g,"\\'"  ) + "',this)\">✓</span></td>";
 
     const barW = maxListeners > 0 ? Math.round(a.last.count / maxListeners * 100) : 0;
 
     return "<tr>" +
-      momentumCell +
       "<td class=\"rank-num col-rank " + rankClass + "\">" + (i + 1) + "</td>" +
       checkCell +
       "<td class=\"artist-name\"><span class=\"artist-name-link\" onclick=\"openArtistModal('" + a.name.replace(/'/g,"\\'") + "')\">" + a.name + "</span></td>" +
@@ -1064,9 +1022,6 @@ async function runScraper() {
   }
 }
 
-// ── MOMENTUM ─────────────────────────────────────────────────
-// (score is computed in buildSummaries)
-
 // ── COMPARE MODE ─────────────────────────────────────────────
 const COMPARE_COLORS = ["#1AA34A","#e05252","#f0a500","#5b8de0","#a05be0"];
 
@@ -1186,7 +1141,7 @@ function openArtistModal(name) {
 
   document.getElementById("artist-modal-title").textContent = a.name;
   document.getElementById("artist-modal-sub").textContent =
-    "Momentum Score: " + a.momentum + " / 100  ·  " + a.daily.length + " days of data";
+    a.daily.length + " days of data";
 
   // Stats
   const peak = Math.max(...a.daily.map(e => e.count));
@@ -1283,8 +1238,6 @@ function buildHallOfFame() {
   const by7 = artistSummaries.filter(s => s.pct7 != null).sort((a,b) => b.pct7 - a.pct7)[0];
   // Fastest growing 30-day
   const by30 = artistSummaries.filter(s => s.pct30 != null).sort((a,b) => b.pct30 - a.pct30)[0];
-  // Highest momentum
-  const topMom = artistSummaries.slice().sort((a,b) => b.momentum - a.momentum)[0];
   // Most consistent (highest fraction of positive days)
   let mostConsistent = null;
   for (const s of artistSummaries) {
@@ -1295,7 +1248,6 @@ function buildHallOfFame() {
   }
 
   const cards = [
-    { icon: "🏆", label: "Highest Momentum Score", name: topMom ? topMom.name : "-", value: topMom ? topMom.momentum + " pts" : "-", sub: "", cls: "gold" },
     { icon: "🚀", label: "Biggest Single-Day Gain", name: bigGain ? bigGain.name : "-", value: bigGain ? "+" + formatNum(bigGain.diff) : "-", sub: bigGain ? formatDate(bigGain.date) : "", cls: "" },
     { icon: "📉", label: "Biggest Single-Day Drop", name: bigDrop ? bigDrop.name : "-", value: bigDrop ? formatNum(bigDrop.diff) : "-", sub: bigDrop ? formatDate(bigDrop.date) : "", cls: "red" },
     { icon: "⚡", label: "Fastest 7-Day Growth", name: by7 ? by7.name : "-", value: by7 ? "+" + by7.pct7.toFixed(2) + "%" : "-", sub: "7-day change", cls: "" },
