@@ -154,11 +154,17 @@
     .tab:nth-child(3) { border-right: none; }
     .tab:nth-child(4) { border-bottom: none; }
     .tab:nth-child(5) { border-right: none; border-bottom: none; }
+    .tab-group { grid-template-columns: repeat(6, 1fr); }
+    .tab:nth-child(1) { grid-column: span 2; }
+    .tab:nth-child(2) { grid-column: span 2; }
+    .tab:nth-child(3) { grid-column: span 2; border-right: none; }
+    .tab:nth-child(4) { grid-column: span 3; }
+    .tab:nth-child(5) { grid-column: span 3; border-right: none; }
     .search-wrap { width: 100%; margin-left: 0; }
     .search-wrap input { width: 100%; font-size: 16px; }
     table { font-size: .65rem; }
     thead th, tbody td { padding: 9px 6px; white-space: nowrap; }
-    .artist-name { font-size: .7rem; max-width: 80px; overflow: hidden; text-overflow: ellipsis; }
+    .artist-name { font-size: .7rem; max-width: 110px; overflow: hidden; text-overflow: ellipsis; }
     .listeners-num { font-size: .85rem; }
     .change-pill { padding: 2px 5px; font-size: .6rem; }
   }
@@ -231,7 +237,7 @@
           <tr>
             <th class="col-rank">#</th>
             <th>Artist</th>
-            <th>Monthly Listeners</th>
+            <th>#Listeners</th>
             <th>Change (Daily)</th>
             <th>Change %</th>
             <th>7-Day Change %</th>
@@ -433,9 +439,9 @@ function renderChart() {
 }
 
 function showStats() {
-  const withChange = artistSummaries.filter(a => a.dailyChange != null);
-  const byGain = withChange.slice().sort((a, b) => b.dailyChange - a.dailyChange);
-  const byDrop = withChange.slice().sort((a, b) => a.dailyChange - b.dailyChange);
+  const withChange = artistSummaries.filter(a => a.dailyPct != null);
+  const byGain = withChange.slice().sort((a, b) => b.dailyPct - a.dailyPct);
+  const byDrop = withChange.slice().sort((a, b) => a.dailyPct - b.dailyPct);
 
   document.getElementById('stat-artists').textContent = artistSummaries.length;
   document.getElementById('stat-snapshots').textContent = allData.length;
@@ -443,12 +449,12 @@ function showStats() {
   if (byGain.length > 0) {
     const g = byGain[0];
     document.getElementById('stat-gain-name').textContent = g.name;
-    document.getElementById('stat-gain-num').textContent = '+' + formatNum(g.dailyChange) + ' today';
+    document.getElementById('stat-gain-num').textContent = '+' + g.dailyPct.toFixed(2) + '% today';
   }
   if (byDrop.length > 0) {
     const d = byDrop[0];
     document.getElementById('stat-drop-name').textContent = d.name;
-    document.getElementById('stat-drop-num').textContent = formatNum(d.dailyChange) + ' today';
+    document.getElementById('stat-drop-num').textContent = d.dailyPct.toFixed(2) + '% today';
   }
   document.getElementById('stats-row').style.display = 'grid';
 }
