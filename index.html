@@ -79,12 +79,12 @@
   }
   .tab:last-child { border-right: none; }
   .tab:hover { color: var(--text); background: var(--card); }
-  .tab.active { background: var(--green); color: #000; font-weight: 500; }
+  .tab.active { background: var(--green); color: #fff; font-weight: 500; }
   .search-wrap { margin-left: auto; position: relative; }
   .search-wrap input {
     background: var(--card); border: 1px solid var(--border); color: var(--text);
-    font-family: 'DM Mono', monospace; font-size: .72rem; padding: 7px 14px 7px 32px;
-    outline: none; width: 200px; transition: border-color .2s; font-size: 16px;
+    font-family: 'DM Mono', monospace; font-size: 16px; padding: 7px 14px 7px 32px;
+    outline: none; width: 200px; transition: border-color .2s;
   }
   .search-wrap input:focus { border-color: var(--green); }
   .search-wrap input::placeholder { color: var(--muted); }
@@ -149,17 +149,13 @@
     .bar-cell { display: none; }
     .col-rank { display: none; }
     #controls { flex-direction: column; align-items: flex-start; gap: 10px; }
-    .tab-group { display: grid; grid-template-columns: repeat(3,1fr); width: 100%; overflow: visible; border: 1px solid var(--border); }
+    .tab-group { display: grid; grid-template-columns: repeat(6,1fr); width: 100%; overflow: visible; border: 1px solid var(--border); }
     .tab { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 10px 4px; font-size: .62rem; letter-spacing: .03em; text-align: center; }
-    .tab:nth-child(3) { border-right: none; }
-    .tab:nth-child(4) { border-bottom: none; }
-    .tab:nth-child(5) { border-right: none; border-bottom: none; }
-    .tab-group { grid-template-columns: repeat(6, 1fr); }
     .tab:nth-child(1) { grid-column: span 2; }
     .tab:nth-child(2) { grid-column: span 2; }
     .tab:nth-child(3) { grid-column: span 2; border-right: none; }
-    .tab:nth-child(4) { grid-column: span 3; }
-    .tab:nth-child(5) { grid-column: span 3; border-right: none; }
+    .tab:nth-child(4) { grid-column: span 3; border-bottom: none; }
+    .tab:nth-child(5) { grid-column: span 3; border-right: none; border-bottom: none; }
     .search-wrap { width: 100%; margin-left: 0; }
     .search-wrap input { width: 100%; font-size: 16px; }
     table { font-size: .65rem; }
@@ -217,9 +213,9 @@
   <div id="controls">
     <span class="control-label">Sort by</span>
     <div class="tab-group">
-      <button class="tab active" onclick="setSort('pct_desc',this)">Gained % &#9650;</button>
-      <button class="tab" onclick="setSort('pct_asc',this)">Lost % &#9650;</button>
-      <button class="tab" onclick="setSort('pct7_desc',this)">7-Day % &#9650;</button>
+      <button class="tab active" onclick="setSort('pct_desc',this)">Gained %</button>
+      <button class="tab" onclick="setSort('pct_asc',this)">Lost %</button>
+      <button class="tab" onclick="setSort('pct7_desc',this)">7-Day %</button>
       <button class="tab" onclick="setSort('listeners_desc',this)">Most Listeners</button>
       <button class="tab" onclick="setSort('name_asc',this)">A-Z</button>
     </div>
@@ -229,34 +225,8 @@
     </div>
   </div>
 
-  <!-- ADD ARTIST MODAL -->
-  <div id="modal-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);z-index:200;align-items:center;justify-content:center;">
-    <div style="background:var(--black);border:1px solid var(--border);padding:28px;width:90%;max-width:440px;position:relative;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.1em;margin-bottom:18px;">Add Artist</div>
-      <div id="token-section">
-        <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">GitHub Token <span style="color:var(--green);font-size:.58rem;">(saved in browser, one-time setup)</span></div>
-        <input id="gh-token-input" type="password" placeholder="ghp_xxxxxxxxxxxx" style="width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:16px;padding:9px 12px;outline:none;margin-bottom:18px;">
-      </div>
-      <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">Spotify Artist URL</div>
-      <input id="add-artist-name" type="text" placeholder="e.g. open.spotify.com/artist/..." style="width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:16px;padding:9px 12px;outline:none;margin-bottom:8px;">
-      <div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">Artist Name</div>
-      <input id="add-artist-url" type="text" placeholder="e.g. Malcolm Todd" style="width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:16px;padding:9px 12px;outline:none;margin-bottom:18px;">
-      <div id="add-artist-error" style="display:none;color:var(--down);font-size:.7rem;margin-bottom:12px;"></div>
-      <div style="display:flex;gap:10px;">
-        <button onclick="submitAddArtist()" style="flex:1;background:var(--green);border:none;color:#000;font-family:'DM Mono',monospace;font-size:.72rem;padding:10px;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;font-weight:500;">Add Artist</button>
-        <button onclick="closeModal()" style="flex:1;background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;padding:10px;cursor:pointer;letter-spacing:.08em;text-transform:uppercase;">Cancel</button>
-      </div>
-      <div id="add-artist-success" style="display:none;margin-top:14px;background:rgba(29,185,84,.12);color:var(--green);font-size:.72rem;padding:10px 12px;border:1px solid rgba(29,185,84,.2);">
-        Artist added! They will appear after the next scrape.
-      </div>
-    </div>
-  </div>
-
   <div id="leaderboard">
-    <div class="section-title" style="justify-content:space-between;">
-      <span>Leaderboard</span>
-      <button onclick="openModal()" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.08em;padding:5px 12px;cursor:pointer;text-transform:uppercase;transition:all .2s;margin-left:auto;" onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">+ Add Artist</button>
-    </div>
+    <div class="section-title">Leaderboard</div>
     <div class="table-wrap">
       <table>
         <thead>
@@ -379,11 +349,11 @@ function setSort(sort, el) {
 
 function sortSummaries(list) {
   return [...list].sort((a, b) => {
-    if (currentSort === 'pct_desc')      return (b.dailyPct != null ? b.dailyPct : -Infinity) - (a.dailyPct != null ? a.dailyPct : -Infinity);
-    if (currentSort === 'pct_asc')       return (a.dailyPct != null ? a.dailyPct :  Infinity) - (b.dailyPct != null ? b.dailyPct :  Infinity);
-    if (currentSort === 'pct7_desc')     return (b.pct7 != null ? b.pct7 : -Infinity) - (a.pct7 != null ? a.pct7 : -Infinity);
+    if (currentSort === 'pct_desc')       return (b.dailyPct != null ? b.dailyPct : -Infinity) - (a.dailyPct != null ? a.dailyPct : -Infinity);
+    if (currentSort === 'pct_asc')        return (a.dailyPct != null ? a.dailyPct :  Infinity) - (b.dailyPct != null ? b.dailyPct :  Infinity);
+    if (currentSort === 'pct7_desc')      return (b.pct7 != null ? b.pct7 : -Infinity) - (a.pct7 != null ? a.pct7 : -Infinity);
     if (currentSort === 'listeners_desc') return b.last.count - a.last.count;
-    if (currentSort === 'name_asc')      return a.name.localeCompare(b.name);
+    if (currentSort === 'name_asc')       return a.name.localeCompare(b.name);
     return 0;
   });
 }
@@ -399,9 +369,7 @@ function renderTable() {
     const dc = a.dailyChange;
     const dcPill = dc == null ? 'pill-neutral' : dc > 0 ? 'pill-up' : dc < 0 ? 'pill-down' : 'pill-neutral';
     const dcArrow = dc == null ? '' : dc > 0 ? '▲ ' : '▼ ';
-    const dcStr = dc == null ? '-' : dcArrow + (dc > 0 ? '+' : '') + formatNum(dc);
-    const dpStr = a.dailyPct == null ? '-' : (a.dailyPct >= 0 ? '+' : '') + a.dailyPct.toFixed(2) + '%';
-    const dpColor = a.dailyPct == null ? 'var(--muted)' : a.dailyPct > 0 ? 'var(--green)' : a.dailyPct < 0 ? 'var(--down)' : 'var(--muted)';
+    const dcStr = dc == null ? '-' : dcArrow + (dc > 0 ? '+' : '') + formatNum(dc) + (a.dailyPct != null ? ' (' + (a.dailyPct >= 0 ? '+' : '') + a.dailyPct.toFixed(2) + '%)' : '');
     const p7Str = a.pct7 == null ? '-' : (a.pct7 >= 0 ? '+' : '') + a.pct7.toFixed(2) + '%';
     const p7Color = a.pct7 == null ? 'var(--muted)' : a.pct7 > 0 ? 'var(--green)' : a.pct7 < 0 ? 'var(--down)' : 'var(--muted)';
     const barW = maxListeners > 0 ? Math.round(a.last.count / maxListeners * 100) : 0;
@@ -410,7 +378,7 @@ function renderTable() {
       '<td class="rank-num col-rank ' + rankClass + '">' + (i+1) + '</td>' +
       '<td class="artist-name">' + a.name + '</td>' +
       '<td class="listeners-num">' + formatNum(a.last.count) + '</td>' +
-      '<td><span class="change-pill ' + dcPill + '">' + dcStr + (a.dailyPct != null ? ' (' + (a.dailyPct >= 0 ? '+' : '') + a.dailyPct.toFixed(2) + '%)' : '') + '</span></td>' +
+      '<td><span class="change-pill ' + dcPill + '">' + dcStr + '</span></td>' +
       '<td style="color:' + p7Color + ';font-size:.75rem">' + p7Str + '</td>' +
       '<td class="bar-cell col-bar"><div class="mini-bar"><div class="mini-bar-fill" style="width:' + barW + '%"></div></div></td>' +
       '</tr>';
@@ -437,8 +405,8 @@ function renderChart() {
       labels: artist.daily.map(e => formatDate(e.ts)),
       datasets: [{
         label: name, data: artist.daily.map(e => e.count),
-        borderColor: '#1DB954', backgroundColor: 'rgba(29,185,84,0.07)',
-        pointBackgroundColor: '#1DB954', pointRadius: 4, pointHoverRadius: 6,
+        borderColor: '#1AA34A', backgroundColor: 'rgba(26,163,74,0.07)',
+        pointBackgroundColor: '#1AA34A', pointRadius: 4, pointHoverRadius: 6,
         borderWidth: 2, fill: true, tension: 0.35
       }]
     },
@@ -502,143 +470,6 @@ function process(text) {
   renderTable();
   document.getElementById('chart-section').style.display = 'block';
   populateChartSelect();
-}
-
-const GITHUB_OWNER = '2222scouter';
-const GITHUB_REPO = 'ultimate-spotify-tracker';
-const GITHUB_TOKEN_SECRET = 'GH_PAT'; // stored in repo secrets - we use a proxy approach
-
-function openModal() {
-  document.getElementById('modal-overlay').style.display = 'flex';
-  document.getElementById('add-artist-name').value = '';
-  document.getElementById('add-artist-url').value = '';
-  document.getElementById('add-artist-error').style.display = 'none';
-  document.getElementById('add-artist-success').style.display = 'none';
-  // Load saved token
-  const saved = localStorage.getItem('_ghpat');
-  if (saved) {
-    window._ghpat = saved;
-    document.getElementById('token-section').style.display = 'none';
-  } else {
-    document.getElementById('token-section').style.display = 'block';
-    document.getElementById('gh-token-input').value = '';
-  }
-}
-
-function closeModal() {
-  document.getElementById('modal-overlay').style.display = 'none';
-}
-
-async function submitAddArtist() {
-  // Save token if entered
-  const tokenInput = document.getElementById('gh-token-input').value.trim();
-  if (tokenInput) {
-    window._ghpat = tokenInput;
-    localStorage.setItem('_ghpat', tokenInput);
-    document.getElementById('token-section').style.display = 'none';
-  }
-  if (!window._ghpat) {
-    errorEl.textContent = 'Please enter your GitHub token first.';
-    errorEl.style.display = 'block';
-    return;
-  }
-
-  const urlInput = document.getElementById('add-artist-name').value.trim();
-  const nameInput = document.getElementById('add-artist-url').value.trim();
-  const errorEl = document.getElementById('add-artist-error');
-  const successEl = document.getElementById('add-artist-success');
-
-  errorEl.style.display = 'none';
-  successEl.style.display = 'none';
-
-  // Validate
-  if (!urlInput || !nameInput) {
-    errorEl.textContent = 'Both fields are required.';
-    errorEl.style.display = 'block';
-    return;
-  }
-
-  // Extract artist ID from URL
-  const urlMatch = urlInput.match(/artist\/([a-zA-Z0-9]+)/);
-  if (!urlMatch) {
-    errorEl.textContent = 'Please enter a valid Spotify artist URL.';
-    errorEl.style.display = 'block';
-    return;
-  }
-
-  const cleanUrl = 'https://open.spotify.com/artist/' + urlMatch[1];
-  const line = nameInput + ', ' + cleanUrl;
-
-  const btn = document.querySelector('#modal-overlay button');
-  btn.textContent = 'Adding...';
-  btn.disabled = true;
-
-  try {
-    // Get current artists.txt from GitHub
-    const getRes = await fetch('https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/contents/artists.txt', {
-      headers: {
-        'Authorization': 'token ' + window._ghpat,
-        'Accept': 'application/vnd.github.v3+json'
-      }
-    });
-
-    if (getRes.status === 401 || getRes.status === 403) {
-      errorEl.textContent = 'GitHub token not configured. See instructions below.';
-      errorEl.style.display = 'block';
-      btn.textContent = 'Add Artist';
-      btn.disabled = false;
-      return;
-    }
-
-    const fileData = await getRes.json();
-    const currentContent = atob(fileData.content.replace(/
-/g, ''));
-
-    // Check if artist already exists
-    if (currentContent.includes(cleanUrl)) {
-      errorEl.textContent = 'This artist is already being tracked.';
-      errorEl.style.display = 'block';
-      btn.textContent = 'Add Artist';
-      btn.disabled = false;
-      return;
-    }
-
-    // Append new artist
-    const newContent = currentContent.trimEnd() + '\n' + line + '\n';
-    const encoded = btoa(unescape(encodeURIComponent(newContent)));
-
-    // Update file on GitHub
-    const putRes = await fetch('https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/contents/artists.txt', {
-      method: 'PUT',
-      headers: {
-        'Authorization': 'token ' + window._ghpat,
-        'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        message: 'Add artist: ' + nameInput,
-        content: encoded,
-        sha: fileData.sha
-      })
-    });
-
-    if (putRes.ok) {
-      successEl.style.display = 'block';
-      btn.textContent = 'Add Artist';
-      btn.disabled = false;
-    } else {
-      const err = await putRes.json();
-      errorEl.textContent = 'GitHub error: ' + (err.message || putRes.status);
-      errorEl.style.display = 'block';
-      btn.textContent = 'Add Artist';
-      btn.disabled = false;
-    }
-  } catch(e) {
-    errorEl.textContent = 'Error: ' + e.message;
-    errorEl.style.display = 'block';
-    btn.textContent = 'Add Artist';
-    btn.disabled = false;
-  }
 }
 
 function loadFromPaste() {
