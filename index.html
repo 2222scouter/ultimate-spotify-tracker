@@ -135,6 +135,10 @@
   .rank-num.top3 { color: var(--green); }
   .artist-name { font-weight: 500; font-size: .82rem; }
   .listeners-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.05rem; letter-spacing: .04em; max-width: 120px; }
+  .abs-change { display: inline-block; font-family: 'DM Mono', monospace; font-size: .6rem; font-weight: 500; padding: 2px 6px; border-radius: 2px; margin-left: 6px; vertical-align: middle; letter-spacing: .02em; }
+  .abs-change-up { background: rgba(26,163,74,.13); color: var(--green); }
+  .abs-change-down { background: rgba(224,82,82,.13); color: var(--down); }
+  .abs-change-neutral { background: rgba(136,136,136,.1); color: var(--neutral); }
   .change-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; font-size: .7rem; font-weight: 500; border-radius: 2px; }
   .pill-up { background: rgba(26,163,74,.12); color: var(--green); }
   .pill-down { background: rgba(224,82,82,.12); color: var(--down); }
@@ -663,7 +667,7 @@ function renderTable() {
       "<td class=\"rank-num col-rank " + rankClass + "\">" + (i + 1) + "</td>" +
       checkCell +
       "<td class=\"artist-name\"><span class=\"artist-name-link\" onclick=\"openArtistModal('" + a.name.replace(/'/g,"\\'") + "')\">" + a.name + "</span></td>" +
-      "<td class=\"listeners-num\">" + formatNum(a.last.count) + "</td>" +
+      "<td class=\"listeners-num\">" + formatNum(a.last.count) + (a.dailyChange != null ? "<span class=\"abs-change " + (a.dailyChange > 0 ? "abs-change-up" : a.dailyChange < 0 ? "abs-change-down" : "abs-change-neutral") + "\">(" + (a.dailyChange > 0 ? "+" : "") + formatNum(a.dailyChange) + ")</span>" : "") + "</td>" +
       "<td>" + pillHtml(a.dailyPct) + "</td>" +
       "<td>" + pillHtml(a.pct7) + "</td>" +
       "<td>" + pillHtml(a.pct30) + "</td>" +
