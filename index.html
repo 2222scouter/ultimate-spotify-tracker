@@ -855,8 +855,24 @@ function showManualNameInput() {
 
 function clearNamePreview() {
   document.getElementById("name-preview").style.display = "none";
-  document.getElementById("name-preview-value").textContent = "";
+  // Reset back to a div in case it was replaced with an input
+  const el = document.getElementById("name-preview-value");
+  if (el.tagName === "INPUT") {
+    const div = document.createElement("div");
+    div.id = "name-preview-value";
+    div.style.fontSize = ".85rem";
+    div.style.fontWeight = "500";
+    div.style.padding = "9px 12px";
+    div.style.background = "var(--card)";
+    div.style.border = "1px solid var(--border)";
+    el.parentNode.replaceChild(div, el);
+    const label = document.getElementById("name-preview").querySelector(".modal-label");
+    if (label) label.textContent = "Artist Name";
+  } else {
+    el.textContent = "";
+  }
 }
+
 
 async function lookupArtistName() {
   const rawUrl = document.getElementById("input-url").value.trim();
