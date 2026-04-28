@@ -245,3 +245,4 @@ where.t.at, https://open.spotify.com/artist/0kxG2FyO4bp80QsBwYQTvo
 Dany Ome, https://open.spotify.com/artist/4uQjbkbjzXEE1SsnMHFK1v
 Evanora Unlimited, https://open.spotify.com/artist/71SAxqRLYirlXRiHsIAuJT
 Gazan, https://open.spotify.com/artist/4Qdtzv8titXp66B9nwAstz
+At The Gates, https://open.spotify.com/artist/6YXarbjg36ODFPez0PnOlD
