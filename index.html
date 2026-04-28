@@ -947,7 +947,15 @@ async function submitArtist() {
   }
 
   const rawUrl = document.getElementById("input-url").value.trim();
-  const name = document.getElementById("name-preview-value").textContent.trim();
+const nameEl = document.getElementById("name-preview-value");
+const name = (nameEl.tagName === "INPUT" ? nameEl.value : nameEl.textContent).trim();
+
+if (name === "Looking up...") {
+  errorEl.textContent = "Still looking up artist name — please wait a moment and try again.";
+  errorEl.style.display = "block";
+  return;
+}
+
 
   if (!rawUrl) {
     errorEl.textContent = "Please enter a Spotify artist URL.";
