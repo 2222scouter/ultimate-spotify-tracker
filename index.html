@@ -1207,7 +1207,7 @@ function openArtistModal(name) {
   if (!a) return;
 
   document.getElementById("artist-modal-title").innerHTML = a.name +
-  ' <button onclick="copySpotifyLink(\'' + a.name.replace(/'/g, "\\'") + '\')" style="font-size:.6rem;padding:3px 8px;background:none;border:1px solid var(--border);color:var(--muted);font-family:\'DM Mono\',monospace;cursor:pointer;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle;margin-left:8px;">⎘ Copy Link</button>';
+  ' <button onclick="copySpotifyLink(\'' + a.name.replace(/'/g, "\\'") + '\')" style="font-size:.6rem;padding:3px 8px;background:none;border:1px solid var(--border);color:var(--muted);font-family:\'DM Mono\',monospace;cursor:pointer;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle;margin-left:8px;">⎘</button>';
   document.getElementById("artist-modal-sub").textContent =
     a.daily.length + " days of data";
 
