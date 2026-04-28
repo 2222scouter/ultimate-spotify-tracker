@@ -1207,7 +1207,7 @@ function openArtistModal(name) {
   if (!a) return;
 
   document.getElementById("artist-modal-title").innerHTML = a.name +
-  ' <button onclick="copySpotifyLink(\'' + a.name.replace(/'/g, "\\'") + '\')" style="font-size:.6rem;padding:3px 8px;background:none;border:1px solid var(--border);color:var(--muted);font-family:\'DM Mono\',monospace;cursor:pointer;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle;margin-left:8px;">⎘</button>';
+  ' <button onclick="copySpotifyLink(\'' + a.name.replace(/'/g, "\\'") + '\', this)" style="font-size:.6rem;padding:3px 8px;background:none;border:1px solid var(--border);color:var(--muted);font-family:\'DM Mono\',monospace;cursor:pointer;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle;margin-left:8px;">⎘</button>';
   document.getElementById("artist-modal-sub").textContent =
     a.daily.length + " days of data";
 
@@ -1276,7 +1276,7 @@ function closeArtistModal() {
   if (detailChartInstance) { detailChartInstance.destroy(); detailChartInstance = null; }
 }
 
-  async function copySpotifyLink(artistName) {
+async function copySpotifyLink(artistName, btn) {
   try {
     const res = await fetch("./artists.txt");
     const text = await res.text();
@@ -1284,12 +1284,13 @@ function closeArtistModal() {
     if (!line) { alert("Artist URL not found."); return; }
     const url = line.split(",").slice(1).join(",").trim();
     await navigator.clipboard.writeText(url);
-    event.target.textContent = "✓ Copied!";
-    setTimeout(() => event.target.textContent = "⎘ Copy Link", 1500);
+    btn.textContent = "✓ Copied!";
+    setTimeout(() => btn.textContent = "⎘ Copy Link", 1500);
   } catch(e) {
     alert("Could not copy: " + e.message);
   }
 }
+
 
 
 // ── HALL OF FAME ──────────────────────────────────────────────
