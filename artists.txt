@@ -269,3 +269,4 @@ Margo XS, https://open.spotify.com/artist/4TfgyYjNRfHUdPJSQGUke0
 BAMBII, https://open.spotify.com/artist/6kf69CwzgodrETRgzcjX95
 Eli, https://open.spotify.com/artist/0phkgcpVchB7IJFJ7KcSP1
 Helena Gao, https://open.spotify.com/artist/2s2ztYpVGqV3BWDbAcd35h
+Malibu, https://open.spotify.com/artist/3gfV2LBMvIE9gjpvowt11B
