@@ -12,6 +12,10 @@ jobs:
   scrape:
     runs-on: ubuntu-latest
 
+    - name: Install Playwright browsers
+  run: npx playwright install
+
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
