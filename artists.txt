@@ -276,3 +276,4 @@ ALEX, https://open.spotify.com/artist/3hPJRjlru1p445TrmVGdIA
 BBpanzu, https://open.spotify.com/artist/4h8eXe8mMUAVe2NthUKnek
 GRESLEY, https://open.spotify.com/artist/3jH7tPNd2gFLXAekbpUCOf
 Sabina, https://open.spotify.com/artist/4pdOJ0BGnP5kN8aeuCV6p7
+EKKSTACY, https://open.spotify.com/artist/0ynzbXwyCzxicMKHBoOkSH
