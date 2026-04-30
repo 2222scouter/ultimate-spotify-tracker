@@ -283,3 +283,4 @@ ISOxo, https://open.spotify.com/artist/4zVCMnjw54nkhGHU4e1Pav
 vinni, https://open.spotify.com/artist/2rvUlmaAfN7eKSVAcaRj9t
 Cristale, https://open.spotify.com/artist/6U1hXHFTV27cbQVXZvnX27
 TeeZandos, https://open.spotify.com/artist/0aDlKdF22vK6yut113KJix
+Gula Väggen, https://open.spotify.com/artist/5g680PZBOiU2EnM6GzoaWc
