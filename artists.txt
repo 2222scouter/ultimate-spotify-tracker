@@ -274,3 +274,4 @@ Kibo, https://open.spotify.com/artist/0FwweSBotriEiIuyaVBkqj
 Ben Vince, https://open.spotify.com/artist/2EWVX9WDwCaDHdsoTFWSPV
 ALEX, https://open.spotify.com/artist/3hPJRjlru1p445TrmVGdIA
 BBpanzu, https://open.spotify.com/artist/4h8eXe8mMUAVe2NthUKnek
+GRESLEY, https://open.spotify.com/artist/3jH7tPNd2gFLXAekbpUCOf
